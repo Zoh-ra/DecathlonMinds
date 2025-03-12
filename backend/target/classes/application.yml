@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: emotional-wellness-api
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/decathlon_minds_db
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# Configuration SpringDoc OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    filter: true
+  packages-to-scan: com.decathlonminds.emotional.controller
+  show-actuator: false
+
+logging:
+  level:
+    com.decathlonminds.emotional: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO

@@ -3,7 +3,6 @@ package com.decathlonminds.emotional.service;
 import com.decathlonminds.emotional.dto.FeedPostDto;
 import com.decathlonminds.emotional.model.FeedPost;
 import com.decathlonminds.emotional.model.PostType;
-import com.decathlonminds.emotional.model.WalkingRoute;
 import com.decathlonminds.emotional.repository.FeedPostRepository;
 import com.decathlonminds.emotional.repository.WalkingRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;

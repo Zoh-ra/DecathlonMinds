@@ -21,14 +21,23 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
     return new Date(dateString).toLocaleDateString('fr-FR', options);
   };
 
+  // Fonction pour éliminer les doublons dans les tags
+  const getUniqueTags = (tags?: string[]) => {
+    if (!tags) return [];
+    // Utiliser un Set pour éliminer les doublons
+    return [...new Set(tags)];
+  };
+
   // Rendu basé sur le type de post
   switch (post.type) {
     case 'SCIENTIFIC':
       return (
         <div className={`${styles.card} ${styles.scientificCard}`}>
-          <div className={styles.imageContainer}>
-            <img src={post.imageUrl} alt={post.title} className={styles.cardImage} />
-          </div>
+          {post.imageUrl && (
+            <div className={styles.imageContainer}>
+              <img src={post.imageUrl} alt={post.title} className={styles.cardImage} />
+            </div>
+          )}
           <div className={styles.cardContent}>
             <h3 className={styles.cardTitle}>{post.title}</h3>
             <div className={styles.cardMeta}>
@@ -48,8 +57,8 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
               </button>
             )}
             <div className={styles.tagsContainer}>
-              {post.tags?.map((tag) => (
-                <span key={tag} className={styles.tag}>#{tag}</span>
+              {getUniqueTags(post.tags).map((tag, index) => (
+                <span key={`${tag}-${index}`} className={styles.tag}>#{tag}</span>
               ))}
             </div>
           </div>
@@ -68,8 +77,8 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
           </div>
           {post.tags && (
             <div className={styles.tagsContainer}>
-              {post.tags.map((tag) => (
-                <span key={tag} className={styles.tag}>#{tag}</span>
+              {getUniqueTags(post.tags).map((tag, index) => (
+                <span key={`${tag}-${index}`} className={styles.tag}>#{tag}</span>
               ))}
             </div>
           )}
@@ -79,13 +88,15 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
     case 'ROUTE':
       return (
         <div className={`${styles.card} ${styles.routeCard}`}>
-          <div className={styles.imageContainer}>
-            <img src={post.imageUrl} alt={post.title} className={styles.cardImage} />
-            <span className={`${styles.difficultyBadge} ${styles[`difficulty${post.difficulty}`]}`}>
-              {post.difficulty === 'EASY' ? 'Facile' : 
-               post.difficulty === 'MEDIUM' ? 'Intermédiaire' : 'Difficile'}
-            </span>
-          </div>
+          {post.imageUrl && (
+            <div className={styles.imageContainer}>
+              <img src={post.imageUrl} alt={post.title} className={styles.cardImage} />
+              <span className={`${styles.difficultyBadge} ${styles[`difficulty${post.difficulty}`]}`}>
+                {post.difficulty === 'EASY' ? 'Facile' : 
+                 post.difficulty === 'MEDIUM' ? 'Intermédiaire' : 'Difficile'}
+              </span>
+            </div>
+          )}
           <div className={styles.cardContent}>
             <h3 className={styles.cardTitle}>{post.title}</h3>
             <div className={styles.routeStats}>
@@ -117,8 +128,8 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
               Voir l&apos;itinéraire
             </button>
             <div className={styles.tagsContainer}>
-              {post.tags?.map((tag) => (
-                <span key={tag} className={styles.tag}>#{tag}</span>
+              {getUniqueTags(post.tags).map((tag, index) => (
+                <span key={`${tag}-${index}`} className={styles.tag}>#{tag}</span>
               ))}
             </div>
           </div>
@@ -128,12 +139,14 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
     case 'EVENT':
       return (
         <div className={`${styles.card} ${styles.eventCard}`}>
-          <div className={styles.imageContainer}>
-            <img src={post.imageUrl} alt={post.title} className={styles.cardImage} />
-            <div className={styles.eventDate}>
-              {formatDate(post.date)}
+          {post.imageUrl && (
+            <div className={styles.imageContainer}>
+              <img src={post.imageUrl} alt={post.title} className={styles.cardImage} />
+              <div className={styles.eventDate}>
+                {formatDate(post.date)}
+              </div>
             </div>
-          </div>
+          )}
           <div className={styles.cardContent}>
             <h3 className={styles.cardTitle}>{post.title}</h3>
             <div className={styles.eventLocation}>
@@ -162,8 +175,8 @@ export default function FeedPostCard({ post }: FeedPostCardProps) {
               </a>
             )}
             <div className={styles.tagsContainer}>
-              {post.tags?.map((tag) => (
-                <span key={tag} className={styles.tag}>#{tag}</span>
+              {getUniqueTags(post.tags).map((tag, index) => (
+                <span key={`${tag}-${index}`} className={styles.tag}>#{tag}</span>
               ))}
             </div>
           </div>

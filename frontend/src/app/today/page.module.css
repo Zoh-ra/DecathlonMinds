@@ -351,6 +351,30 @@
   transform: translateX(1rem);
 }
 
+.lightMode .suggestionButton {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.lightMode .suggestionButton:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.lightMode .suggestionButton:active {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.lightMode .suggestionIcon {
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* Le fond et la couleur du texte seront définis dynamiquement dans le composant */
+}
+
 .inputContainer {
   position: relative;
   margin: 0 1rem;

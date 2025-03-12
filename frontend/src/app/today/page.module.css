@@ -2,39 +2,289 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
-  padding: 2rem;
-  background-color: #f5f5f5;
+  padding: 1rem;
+  background: linear-gradient(135deg, #300e5f 0%, #180533 100%);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.lightMode {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  color: #333;
+}
+
+.lightMode .menuButton, 
+.lightMode .themeButton, 
+.lightMode .suggestionButton, 
+.lightMode .modeButton, 
+.lightMode .inputBar {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.lightMode .inputBar::placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.lightMode .assistantIcon {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 480px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem;
+}
+
+.menuButton, .themeButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menuButton:hover, .themeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Styles for the menu */
+.menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh;
+  background: rgba(32, 7, 65, 0.95);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+  transform-origin: left;
+}
+
+.lightMode .menu {
+  background: rgba(245, 245, 245, 0.95);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.menuHeader {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lightMode .menuHeader {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.lightMode .closeButton {
+  color: #333;
+}
+
+.menuHeader h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.menuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menuList li {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s ease;
+}
+
+.lightMode .menuList li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menuList li:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lightMode .menuList li:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.menuList a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  font-size: 1rem;
+}
+
+.lightMode .menuList a {
+  color: #333;
+}
+
+.assistantContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin: 2rem 0;
 }
 
-.title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #0070f3;
+.assistantIcon {
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
 }
 
-.description {
-  font-size: 1.2rem;
+.assistantText {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.assistantSubtext {
+  font-size: 1rem;
+  opacity: 0.8;
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.suggestionsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.suggestionButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 24px;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suggestionButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.suggestionIcon {
+  width: 24px;
+  height: 24px;
+  background: rgba(126, 87, 194, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+}
+
+.inputContainer {
+  position: relative;
+  margin: 0 1rem;
+  margin-top: auto;
+  margin-bottom: 1.5rem;
+}
+
+.inputBar {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 24px;
+  color: white;
+  padding: 1rem 3rem 1rem 1rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+.inputBar::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sendButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sendButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lightMode .sendButton {
   color: #333;
+}
+
+.lightMode .sendButton:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .chatbotContainer {
   width: 100%;
-  max-width: 800px;
-  height: 600px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  background-color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
+/* Chat messages styles will be handled by the Chatbot component */

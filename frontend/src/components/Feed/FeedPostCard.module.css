@@ -1,0 +1,232 @@
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  overflow: hidden;
+}
+
+.cardImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .cardImage {
+  transform: scale(1.05);
+}
+
+.cardContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #2d3748;
+  line-height: 1.3;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.author, .date, .source {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cardText {
+  color: #4a5568;
+  line-height: 1.6;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  margin-bottom: 1rem;
+}
+
+.cardText.expanded {
+  -webkit-line-clamp: initial;
+  display: block;
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: #0066cc;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+
+.expandButton:hover {
+  text-decoration: underline;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.tag {
+  background-color: #f1f5f9;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Specific card styles */
+.scientificCard {
+  border-top: 5px solid #0066cc;
+}
+
+.quoteCard {
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.quoteText {
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.quoteAuthor {
+  font-size: 1rem;
+  color: #718096;
+}
+
+.routeStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.routeStat {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.routeStatIcon {
+  font-size: 1.1rem;
+}
+
+.difficultyBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
+}
+
+.difficultyEASY {
+  background-color: #48bb78;
+}
+
+.difficultyMEDIUM {
+  background-color: #ed8936;
+}
+
+.difficultyHARD {
+  background-color: #e53e3e;
+}
+
+.eventDate {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.eventLocation {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.actionButton {
+  display: inline-block;
+  background-color: #0066cc;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  margin-bottom: 1rem;
+  text-decoration: none;
+}
+
+.actionButton:hover {
+  background-color: #0055aa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cardTitle {
+    font-size: 1.1rem;
+  }
+  
+  .quoteText {
+    font-size: 1.2rem;
+  }
+}

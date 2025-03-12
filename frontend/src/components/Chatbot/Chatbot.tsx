@@ -10,24 +10,21 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
-// États du chat : initial, sélection d'émotion, sélection de cause, affichage de la réponse
 type ChatStateType = 'initial' | 'selecting_emotion' | 'selecting_reason' | 'chat';
 
 interface ChatbotProps {
   initialMessage?: string;
   onBack?: () => void;
-  onClose?: () => void;
   emotionColor?: string;
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emotionColor }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor }) => {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatState, setChatState] = useState<ChatStateType>('initial');
   const [selectedEmotion, setSelectedEmotion] = useState('');
-  const [inputValue, setInputValue] = useState('');
 
   // Liste des émotions disponibles
   const emotions = [
@@ -36,12 +33,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emot
     { text: "En colère", icon: "😠", emotion: "ANGRY" },
     { text: "Anxieux(se)", icon: "😰", emotion: "ANXIOUS" },
     { text: "Fatigué(e)", icon: "😴", emotion: "TIRED" },
-    { text: "Surpris(e)", icon: "😮", emotion: "SURPRISED" },
     { text: "Calme", icon: "😌", emotion: "CALM" },
     { text: "Excité(e)", icon: "🤩", emotion: "EXCITED" },
   ];
   
-  // Causes possibles par émojis
+  // Causes possibles
   const emotionCauses = [
     { emoji: "🏃", label: "Sport", cause: "sport" },
     { emoji: "👨‍👩‍👧‍👦", label: "Famille", cause: "famille" },
@@ -53,282 +49,254 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emot
     { emoji: "🤔", label: "Autre", cause: "autre" },
   ];
 
-  // Fonction pour générer un ID unique pour les messages
+  // ID unique pour les messages
   const generateUniqueId = (prefix: string) => {
     return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   };
 
   // Initialisation du chat
   useEffect(() => {
-    if (initialMessage && initialMessage.startsWith("Je me sens ")) {
-      // Cas où on arrive avec une émotion sélectionnée (depuis le bouton de la page Today)
-      const emotion = initialMessage.replace("Je me sens ", "");
-      setSelectedEmotion(emotion);
-      
-      // Afficher le message de l'utilisateur
-      const userMessageId = generateUniqueId('user');
-      setMessages([{
-        id: userMessageId,
-        text: initialMessage,
-        sender: 'user',
-      }]);
-      
-      // Passer à la sélection de la cause
-      setChatState('selecting_reason');
-    } else if (messages.length === 0) {
-      // Message de bienvenue et invitation à sélectionner une émotion
-      setMessages([{
-        id: generateUniqueId('bot'),
-        text: "Bonjour ! Je suis DécathlonMinds, votre compagnon bien-être. Comment vous sentez-vous aujourd'hui ?",
-        sender: 'bot',
-      }]);
-      
-      // Afficher les émojis d'émotions
-      setChatState('selecting_emotion');
+    if (messages.length === 0) {
+      if (initialMessage && initialMessage.startsWith("Je me sens ")) {
+        const emotion = initialMessage.replace("Je me sens ", "");
+        setSelectedEmotion(emotion);
+        
+        setMessages([{
+          id: generateUniqueId('bot'),
+          text: "Bonjour ! Je suis myMind, votre compagnon bien-être.",
+          sender: 'bot' as const,
+        }, {
+          id: generateUniqueId('user'),
+          text: initialMessage,
+          sender: 'user' as const,
+        }, {
+          id: generateUniqueId('bot'),
+          text: "Cette émotion est liée à quelle situation ?",
+          sender: 'bot' as const,
+        }]);
+        
+        setChatState('selecting_reason');
+      } else {
+        setMessages([{
+          id: generateUniqueId('bot'),
+          text: "Bonjour ! Je suis myMind, votre compagnon bien-être. Comment vous sentez-vous aujourd'hui ?",
+          sender: 'bot' as const,
+        }]);
+        
+        setChatState('selecting_emotion');
+      }
     }
   }, [initialMessage, messages.length]);
 
-  // Scroll vers le bas à chaque changement de messages
+  // Scroll vers le bas à chaque nouveau message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Fonction pour gérer la sélection d'une émotion
+  // Sélection d'une émotion
   const handleEmotionSelection = (emotion: string, emotionName: string) => {
-    // Ajouter le message de l'utilisateur
-    setMessages(prev => [...prev, {
-      id: generateUniqueId('user'),
-      text: `Je me sens ${emotionName}`,
-      sender: 'user',
-    }]);
+    const updatedMessages = [
+      ...messages,
+      {
+        id: generateUniqueId('user'),
+        text: `Je me sens ${emotionName}`,
+        sender: 'user' as const,
+      },
+      {
+        id: generateUniqueId('bot'),
+        text: "Cette émotion est liée à quelle situation ?",
+        sender: 'bot' as const,
+      }
+    ];
     
-    // Enregistrer l'émotion et passer à la sélection de cause
+    setMessages(updatedMessages);
     setSelectedEmotion(emotionName);
     setChatState('selecting_reason');
   };
 
-  // Fonction pour gérer la sélection d'une cause
-  const handleCauseSelection = (cause: string) => {
-    // Rediriger vers la page de motivation avec les paramètres d'émotion et de cause
-    router.push(`/motivation?emotion=${encodeURIComponent(selectedEmotion)}&cause=${encodeURIComponent(cause)}`);
-  };
-
-  // Fonction pour obtenir une citation rassurante
-  const fetchReassuranceQuote = async (emotion: string, reason: string) => {
-    try {
-      const response = await fetch('/api/emotion/quote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ emotion, reason }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      // Ajouter la citation aux messages
-      setIsTyping(false);
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          id: generateUniqueId('bot'),
-          text: data.quote,
-          sender: 'bot',
-        },
-      ]);
-      
-      // Préparer pour un nouveau cycle d'interactions
-      setChatState('selecting_emotion');
-    } catch (error) {
-      console.error('Error:', error);
-      setIsTyping(false);
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          id: generateUniqueId('bot'),
-          text: "Désolé, je n'ai pas pu obtenir une citation adaptée à votre situation. Comment vous sentez-vous maintenant ?",
-          sender: 'bot',
-        },
-      ]);
-      setChatState('selecting_emotion');
+  // Obtenir une réponse adaptée à l'émotion et à la cause
+  const getResponse = (emotion: string, cause: string): string => {
+    // Si l'émotion est vide, retourner une réponse par défaut
+    if (!emotion || emotion.trim() === '') {
+      return "Je ne suis pas sûr de comprendre votre émotion. Une marche ou un jogging peuvent néanmoins être bénéfiques pour votre bien-être général.";
     }
+    
+    if (emotion === "Heureux(se)" || emotion === "Calme" || emotion === "Excité(e)") {
+      if (cause === "sport") {
+        return `C'est super de vous sentir ${emotion.toLowerCase()} ! Continuez sur cette lancée avec une marche ou un jogging de 15-20 minutes pour libérer encore plus d'endorphines.`;
+      } else {
+        return `C'est super de vous sentir ${emotion.toLowerCase()} ! Une marche ou un jogging peuvent vous aider à prolonger cet état de bien-être.`;
+      }
+    } 
+    else if (emotion === "Triste") {
+      if (cause === "relation" || cause === "famille") {
+        return "Je comprends que la tristesse puisse être difficile. Une marche en plein air peut vous offrir un moment de recul et de perspective. 15 minutes d'activité douce stimuleront votre sérotonine.";
+      } else {
+        return "Je comprends que la tristesse puisse être difficile. Une marche douce de 15 minutes peut stimuler la sérotonine et améliorer votre humeur. Le mouvement est un excellent moyen de prendre soin de soi.";
+      }
+    } 
+    else if (emotion === "En colère") {
+      if (cause === "travail" || cause === "finances") {
+        return "La colère est une émotion puissante qui peut être canalisée positivement. Un jogging énergique vous permettrait de libérer cette frustration et de retrouver une clarté d'esprit pour aborder vos défis.";
+      } else {
+        return "La colère est une émotion puissante qui peut être canalisée positivement. Un jogging énergique vous aiderait à libérer cette tension et à retrouver plus de clarté mentale.";
+      }
+    } 
+    else if (emotion === "Anxieux(se)") {
+      if (cause === "mental") {
+        return "L'anxiété peut être apaisée par l'activité physique. Une marche en pleine conscience, où vous vous concentrez sur votre respiration et vos pas, peut réduire le niveau de cortisol et apaiser votre système nerveux.";
+      } else {
+        return "L'anxiété peut être apaisée par l'activité physique. Une marche en pleine conscience peut réduire le niveau de cortisol et vous aider à retrouver un sentiment de contrôle.";
+      }
+    } 
+    else if (emotion === "Fatigué(e)") {
+      if (cause === "maison" || cause === "travail") {
+        return "La fatigue peut paradoxalement être combattue par une activité douce. Changer d'environnement avec une courte marche de 10 minutes peut revitaliser votre énergie bien plus efficacement qu'une pause café.";
+      } else {
+        return "La fatigue peut paradoxalement être combattue par une activité douce. Une courte marche de 10 minutes peut augmenter votre énergie plus efficacement qu'une pause café.";
+      }
+    } 
+    
+    // Réponse par défaut
+    return "Je comprends votre sentiment. L'activité physique est un excellent moyen de prendre soin de votre santé mentale. Une marche ou un jogging peuvent vous aider à retrouver un équilibre émotionnel.";
   };
 
-  const formatMessage = (message: string) => {
-    // Formatage des liens dans les messages
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return message.replace(urlRegex, (url) => {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
+  // Sélection d'une cause
+  const handleCauseSelection = (cause: string) => {
+    // 1. Ajouter le message utilisateur
+    const userMessage: Message = {
+      id: generateUniqueId('user'),
+      text: `Cette émotion est liée à : ${cause}`,
+      sender: 'user' as const,
+    };
+    
+    // 2. Générer la réponse
+    const response = getResponse(selectedEmotion, cause);
+    
+    // 3. Créer le message de réponse du bot
+    const botMessage: Message = {
+      id: generateUniqueId('bot'),
+      text: response,
+      sender: 'bot' as const,
+    };
+    
+    // 4. Mettre à jour les messages et simuler la frappe
+    setIsTyping(true);
+    setMessages(prev => [...prev, userMessage]);
+    
+    // 5. Afficher la réponse après un délai
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages(prev => [...prev, botMessage]);
+      setChatState('chat');
+    }, 1000);
   };
 
+  // Redirection vers la page feed
+  const handleStartJourney = () => {
+    router.push('/feed');
+  };
+
+  // Styles conditionnels basés sur emotionColor
   const getBotMessageStyle = () => {
     if (emotionColor) {
       return {
-        backgroundColor: `${emotionColor}80`,
+        backgroundColor: `${emotionColor}30`,
         borderColor: emotionColor,
-        boxShadow: `0 1px 8px ${emotionColor}40`
-      };
-    }
-    return {};
-  };
-
-  const getEmojiBgStyle = () => {
-    if (emotionColor) {
-      return {
-        backgroundColor: `rgba(255, 255, 255, 0.2)`,
-        backdropFilter: 'blur(8px)',
-        border: `1px solid rgba(255, 255, 255, 0.3)`,
-        boxShadow: `0 4px 15px rgba(0, 0, 0, 0.15)`,
-        color: 'white'
-      };
-    }
-    return {
-      backgroundColor: `rgba(255, 255, 255, 0.2)`,
-      backdropFilter: 'blur(8px)',
-      border: `1px solid rgba(255, 255, 255, 0.3)`,
-      boxShadow: `0 4px 15px rgba(0, 0, 0, 0.15)`,
-      color: 'white'
-    };
-  };
-
-  const getEmojiContainerStyle = () => {
-    if (emotionColor) {
-      return {
-        backgroundColor: 'transparent',
-        border: 'none'
-      };
-    }
-    return {
-      backgroundColor: 'transparent',
-      border: 'none'
-    };
-  };
-
-  const getButtonStyle = () => {
-    if (emotionColor) {
-      return {
-        backgroundColor: `${emotionColor}50`,
-        borderColor: emotionColor,
-        color: 'white'
       };
     }
     return {};
   };
 
   return (
-    <div 
-      className={styles.chatbot} 
-      style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        border: 'none',
-        outline: 'none',
-        boxShadow: 'none',
-        zIndex: 1000,
-        margin: 0,
-        padding: 0,
-        background: emotionColor 
-          ? `linear-gradient(135deg, ${emotionColor} 0%, #180533 100%)` 
-          : 'linear-gradient(135deg, #300e5f 0%, #180533 100%)'
-      }}
-    >
+    <div className={styles.chatbot} style={{
+      background: emotionColor 
+        ? `linear-gradient(135deg, ${emotionColor}30 0%, #180533 100%)` 
+        : 'linear-gradient(135deg, #300e5f 0%, #180533 100%)'
+    }}>
       <div className={styles.chatHeader}>
-        <button 
-          onClick={onBack} 
-          className={styles.backButton}
-          aria-label="Retour à l'écran d'accueil"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="3" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5" />
-            <path d="M12 19l-7-7 7-7" />
+        <button className={styles.backButton} onClick={onBack}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
+        <div className={styles.chatTitle}>
+          myMind
+          <span className={styles.activeIndicator}></span>
+        </div>
       </div>
-      <div className={styles.messagesContainer}>
+
+      <div className={styles.chatMessages}>
         {/* Affichage des messages */}
-        {messages.map((message, index) => (
-          <div key={index} className={styles.messageContainer}>
-            <div
-              className={`${styles.message} ${
-                message.sender === 'user' ? styles.userMessage : styles.botMessage
-              }`}
-              style={message.sender !== 'user' ? getBotMessageStyle() : {}}
-              dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
-            ></div>
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`${styles.message} ${
+              message.sender === 'user' ? styles.userMessage : styles.botMessage
+            }`}
+            style={message.sender === 'bot' ? getBotMessageStyle() : {}}
+          >
+            <div className={styles.messageText}>{message.text}</div>
           </div>
         ))}
         
-        {/* Affichage des émojis d'émotion */}
-        {chatState === 'selecting_emotion' && (
-          <div className={styles.emojiCauseContainer} style={getEmojiContainerStyle()}>
-            {emotions.map((item, index) => (
-              <div key={index} className={styles.emojiWrapper}>
-                <button 
-                  className={styles.emojiCauseButton}
-                  onClick={() => handleEmotionSelection(item.emotion, item.text)}
-                >
-                  {item.icon}
-                </button>
-                <div className={styles.emojiLabel}>{item.text}</div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Affichage des émojis de cause */}
-        {chatState === 'selecting_reason' && (
-          <div className={styles.emojiCauseContainer}>
-            <div className={styles.causesGrid}>
-              {emotionCauses.map((cause) => (
-                <div 
-                  key={cause.cause} 
-                  className={styles.reasonOption} 
-                  onClick={() => handleCauseSelection(cause.cause)}
-                  style={getEmojiBgStyle()}
-                >
-                  <div className={styles.reasonEmoji}>{cause.emoji}</div>
-                  <div className={styles.reasonLabel}>{cause.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        
         {/* Indicateur de chargement */}
         {isTyping && (
-          <div className={styles.messageContainer}>
-            <div className={styles.botMessage}>
-              <div className={styles.typingIndicator}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+          <div className={`${styles.message} ${styles.botMessage}`}>
+            <div className={styles.typingIndicator}>
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
+          </div>
+        )}
+        
+        {/* Bouton Commencer */}
+        {chatState === 'chat' && (
+          <div className={styles.startButtonContainer}>
+            <button 
+              className={styles.startButton}
+              onClick={handleStartJourney}
+            >
+              Commencer
+            </button>
           </div>
         )}
         
         <div ref={messagesEndRef} />
       </div>
+      
+      {/* Sélection d'émotion - maintenant affiché en dehors du chatMessages pour une position fixe en bas */}
+      {chatState === 'selecting_emotion' && (
+        <div className={styles.emojiContainer}>
+          {emotions.map((emotion) => (
+            <button
+              key={emotion.emotion}
+              className={styles.emojiButton}
+              onClick={() => handleEmotionSelection(emotion.emotion, emotion.text)}
+            >
+              <span>{emotion.icon}</span>
+              <span className={styles.emojiLabel}>{emotion.text}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      
+      {/* Sélection de cause - maintenant affiché en dehors du chatMessages pour une position fixe en bas */}
+      {chatState === 'selecting_reason' && (
+        <div className={styles.emojiContainer}>
+          {emotionCauses.map((cause) => (
+            <button
+              key={cause.cause}
+              className={styles.emojiButton}
+              onClick={() => handleCauseSelection(cause.cause)}
+            >
+              <span>{cause.emoji}</span>
+              <span className={styles.emojiLabel}>{cause.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

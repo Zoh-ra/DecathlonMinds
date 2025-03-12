@@ -6,13 +6,56 @@ import Chatbot from '../../components/Chatbot/Chatbot';
 
 export default function TodayPage() {
   const [showChat, setShowChat] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [selectedSuggestion, setSelectedSuggestion] = useState("");
   const [darkMode, setDarkMode] = useState(true);
+  const [selectedEmotion, setSelectedEmotion] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedSuggestion, setSelectedSuggestion] = useState('');
 
-  // Suppression du timer automatique qui lançait le chat
-  // L'utilisateur doit maintenant explicitement démarrer le chat
+  const emotions = [
+    { text: "Heureux(se)", icon: "😊", emotion: "HAPPY", color: "#FFD700" }, // Jaune doré
+    { text: "Joyeux(se)", icon: "🥳", emotion: "JOYFUL", color: "#FF8C00" }, // Orange vif
+    { text: "Excité(e)", icon: "😃", emotion: "EXCITED", color: "#FF4500" }, // Rouge-orangé
+    { text: "Satisfait(e)", icon: "😌", emotion: "SATISFIED", color: "#9ACD32" }, // Vert jaune
+    { text: "Confiant(e)", icon: "😎", emotion: "CONFIDENT", color: "#32CD32" }, // Vert lime
+    { text: "Triste", icon: "😔", emotion: "SAD", color: "#FFB6C1" }, // Rose clair (contraire)
+    { text: "Mélancolique", icon: "😔", emotion: "MELANCHOLIC", color: "#FFC0CB" }, // Rose (contraire)
+    { text: "Déçu(e)", icon: "😞", emotion: "DISAPPOINTED", color: "#FFFFE0" }, // Jaune pâle (contraire)
+    { text: "En colère", icon: "😡", emotion: "ANGRY", color: "#E0FFFF" }, // Cyan clair (contraire)
+    { text: "Frustré(e)", icon: "😤", emotion: "FRUSTRATED", color: "#F0FFF0" }, // Vert menthe (contraire)
+    { text: "Anxieux(se)", icon: "😰", emotion: "ANXIOUS", color: "#FFF8DC" }, // Blanc-crème (contraire)
+  ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    // Fonction pour supprimer toute bordure violette
+    const removePurpleBorders = () => {
+      // Cibler tous les éléments qui pourraient avoir une bordure
+      document.querySelectorAll('main, div, .chatbot, .chatbotContainer').forEach(el => {
+        if (el instanceof HTMLElement) {
+          el.style.border = 'none';
+          el.style.outline = 'none';
+          el.style.boxShadow = 'none';
+        }
+      });
+    };
+    
+    // Exécuter après le rendu
+    if (showChat) {
+      setTimeout(removePurpleBorders, 0);
+    }
+  }, [showChat]);
 
   const handleStartChat = () => {
     setShowChat(true);
@@ -20,6 +63,12 @@ export default function TodayPage() {
 
   const handleSuggestionClick = (suggestion: string) => {
     setSelectedSuggestion(suggestion);
+    setShowChat(true);
+  };
+
+  const handleEmotionClick = (emotion: string, color: string) => {
+    setSelectedSuggestion(`Je me sens ${emotion}`);
+    setSelectedEmotion(color);
     setShowChat(true);
   };
 
@@ -31,16 +80,6 @@ export default function TodayPage() {
     setMenuOpen(!menuOpen);
   };
 
-  // Remplacer les suggestions par les émotions
-  const emotions = [
-    { text: "Heureux(se)", icon: "😊", emotion: "HAPPY" },
-    { text: "Triste", icon: "😔", emotion: "SAD" },
-    { text: "En colère", icon: "😠", emotion: "ANGRY" },
-    { text: "Anxieux(se)", icon: "😰", emotion: "ANXIOUS" },
-    { text: "Fatigué(e)", icon: "😴", emotion: "TIRED" },
-  ];
-
-  // Fonction pour gérer l'envoi de message via le champ texte
   const handleSendInputMessage = () => {
     if (inputValue.trim()) {
       setSelectedSuggestion(inputValue);
@@ -50,7 +89,7 @@ export default function TodayPage() {
 
   return (
     <main className={`${styles.main} ${!darkMode ? styles.lightMode : ''}`}>
-      <div className={styles.container}>
+      <div className={styles.container} style={{ borderColor: 'transparent' }}>
         {!showChat ? (
           <>
             <div className={styles.header}>
@@ -101,6 +140,10 @@ export default function TodayPage() {
                         setShowChat(false);
                       }}
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                      </svg>
                       Accueil
                     </button>
                   </li>
@@ -111,6 +154,10 @@ export default function TodayPage() {
                         setShowChat(true);
                       }}
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
                       Today
                     </button>
                   </li>
@@ -118,6 +165,10 @@ export default function TodayPage() {
                     <button
                       onClick={toggleMenu}
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
                       Mon Profil
                     </button>
                   </li>
@@ -125,6 +176,10 @@ export default function TodayPage() {
                     <button
                       onClick={toggleMenu}
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                        <path d="M3 3v18h18"></path>
+                        <path d="m19 9-5 5-4-4-3 3"></path>
+                      </svg>
                       Historique
                     </button>
                   </li>
@@ -132,66 +187,70 @@ export default function TodayPage() {
                     <button
                       onClick={toggleMenu}
                     >
-                      Paramètres
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            )}
-
-            <div className={styles.assistantContainer}>
-              <div className={styles.assistantIcon}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a370f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2v8"></path>
-                  <path d="M18.4 12a6.4 6.4 0 1 1-12.8 0 6.4 6.4 0 0 1 12.8 0Z"></path>
-                  <path d="M19 16v6"></path>
-                  <path d="M5 16v6"></path>
-                  <path d="M12 22v-4"></path>
-                </svg>
-              </div>
-              <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>Décathlon</span>Minds</h1>
-              <p className={styles.assistantSubtext}>Comment puis-je vous aider aujourd'hui ?</p>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Paramètres
+                  </button>
+                </li>
+              </ul>
             </div>
-
-            <div className={styles.suggestionsContainer}>
-              {emotions.map((emotion, index) => (
-                <button 
-                  key={index}
-                  className={styles.suggestionButton} 
-                  onClick={() => handleSuggestionClick(`Je me sens ${emotion.text}`)}
-                >
-                  <span className={styles.suggestionIcon}>{emotion.icon}</span>
-                  {emotion.text}
-                </button>
-              ))}
-            </div>
-
-            {/* Suppression du conteneur de mode avec les boutons Assistant et Recherche */}
-
-            <div className={styles.inputContainer}>
-              <input 
-                type="text" 
-                className={styles.inputBar} 
-                placeholder="Message DécathlonMinds..." 
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && inputValue.trim()) {
-                    handleSendInputMessage();
-                  }
-                }}
+          )}
+          <div className={styles.assistantContainer}>
+            <div className={styles.assistantIcon}>
+              <img 
+                src="/images/logo/DecathlonMindsLogo.png" 
+                alt="Décathlon Minds Logo" 
+                width="120" 
+                height="120" 
+                style={{ objectFit: 'contain' }} 
               />
-              <button className={styles.sendButton} onClick={handleSendInputMessage} aria-label="Envoyer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m3 3 3 9-3 9 19-9Z"></path>
-                  <path d="M6 12h16"></path>
-                </svg>
-              </button>
             </div>
+            <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>Décathlon</span>Minds</h1>
+            <p className={styles.assistantSubtext}>Comment puis-je vous aider aujourd'hui ?</p>
+          </div>
+
+          <div className={styles.suggestionsContainer}>
+            {emotions.map((emotion, index) => (
+              <button
+                key={index}
+                className={styles.suggestionButton}
+                onClick={() => handleEmotionClick(emotion.text, emotion.color)}
+                style={{ 
+                  background: `linear-gradient(135deg, rgba(25, 18, 40, 0.75), ${emotion.color}40)`,
+                  borderColor: `${emotion.color}60` 
+                }}
+              >
+                <div className={styles.suggestionIcon} style={{ 
+                  background: `${emotion.color}30`,
+                  color: emotion.color 
+                }}>
+                  {emotion.icon}
+                </div>
+                {emotion.text}
+              </button>
+            ))}
+          </div>
           </>
         ) : (
-          <div className={styles.chatbotContainer}>
-            <Chatbot initialMessage={selectedSuggestion || inputValue} />
+          <div 
+            className={styles.chatbotContainer} 
+            style={{ 
+              border: 'none',
+              outline: 'none',
+              boxShadow: 'none',
+              overflow: 'hidden',
+              background: 'transparent',
+              padding: 0,
+              margin: 0
+            }}
+          >
+            <Chatbot
+              initialMessage={selectedSuggestion}
+              onBack={() => setShowChat(false)}
+              emotionColor={selectedEmotion}
+            />
           </div>
         )}
       </div>

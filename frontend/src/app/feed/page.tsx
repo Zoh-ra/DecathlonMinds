@@ -18,27 +18,60 @@ export default function FeedPage() {
   const emotion = searchParams.get('emotion') || undefined;
   const cause = searchParams.get('cause') || undefined;
   
-  // Fonction pour définir un message adapté à l'émotion
+  // Fonction pour définir un message adapté à l'émotion et à la cause
   const getEmotionMessage = () => {
     if (!emotion) return "Découvrez notre sélection de contenu adapté.";
     
+    // Messages génériques basés sur l'émotion
+    let baseMessage = "";
     switch (emotion) {
       case 'HAPPY':
       case 'JOYFUL':
       case 'CONFIDENT':
-        return "Super ! Continuez sur cette lancée positive avec notre sélection de contenu.";
+        baseMessage = "Super ! Continuez sur cette lancée positive";
+        break;
       case 'SAD':
       case 'MELANCHOLIC':
-        return "Nous avons sélectionné du contenu pour vous réconforter et vous inspirer.";
+        baseMessage = "Nous avons sélectionné du contenu pour vous réconforter";
+        break;
       case 'ANXIOUS':
       case 'FRUSTRATED':
-        return "Respirez profondément. Voici du contenu qui pourrait vous aider à vous apaiser.";
+        baseMessage = "Respirez profondément. Voici du contenu qui pourrait vous aider à vous apaiser";
+        break;
       case 'TIRED':
       case 'EXHAUSTED':
-        return "Prenez votre temps. Nous avons sélectionné du contenu adapté pour vous revitaliser.";
+        baseMessage = "Prenez votre temps. Nous avons sélectionné du contenu adapté pour vous revitaliser";
+        break;
       default:
-        return `Voici du contenu adapté à votre humeur : ${emotion}.`;
+        baseMessage = `Voici du contenu adapté à votre humeur`;
     }
+    
+    // Personnalisation basée sur la cause
+    if (cause) {
+      switch (cause.toLowerCase()) {
+        case 'travail':
+        case 'work':
+          return `${baseMessage} concernant le stress professionnel. Équilibrer vie professionnelle et bien-être est essentiel.`;
+        case 'sport':
+        case 'exercise':
+          return `${baseMessage} en lien avec vos activités sportives. L'activité physique est un excellent moyen de gérer les émotions.`;
+        case 'relation':
+        case 'family':
+        case 'famille':
+          return `${baseMessage} concernant vos relations. Des liens sociaux de qualité sont importants pour votre bien-être.`;
+        case 'santé':
+        case 'health':
+          return `${baseMessage} en rapport avec votre santé. Prendre soin de soi est la première étape vers le bien-être.`;
+        case 'finances':
+        case 'money':
+        case 'argent':
+          return `${baseMessage} pour vous aider à gérer le stress financier. Bien-être et finances peuvent aller de pair.`;
+        default:
+          return `${baseMessage} en fonction de votre situation: ${cause}.`;
+      }
+    }
+    
+    return `${baseMessage} avec notre sélection de contenu.`;
   };
   
   // Récupérer les posts depuis l'API

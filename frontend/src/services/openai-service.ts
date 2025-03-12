@@ -120,7 +120,9 @@ class OpenAIService {
     if (emotion) {
       prompt += ` L'utilisateur ressent l'émotion: ${emotion}`;
       if (cause) {
-        prompt += ` liée à: ${cause}`;
+        prompt += ` liée à: ${cause}. Le contenu doit absolument prendre en compte à la fois l'émotion ET la cause pour être le plus pertinent et personnalisé possible.`;
+      } else {
+        prompt += `.`;
       }
     }
     
@@ -141,7 +143,7 @@ class OpenAIService {
     Pour ROUTE: id, type, title, location, distance (km), duration (minutes), difficulty (EASY/MEDIUM/HARD), description, imageUrl (laisse vide), tags
     Pour EVENT: id, type, title, date, location, description, imageUrl (laisse vide), registrationLink (optionnel), tags
 
-    Assure-toi que le contenu soit varié, pertinent et adapté à l'état émotionnel de l'utilisateur.`;
+    Assure-toi que le contenu soit varié, pertinent et TRÈS SPÉCIFIQUEMENT adapté à la combinaison de l'état émotionnel de l'utilisateur et de la cause qui a généré cette émotion.`;
     
     return prompt;
   }
@@ -275,32 +277,103 @@ class OpenAIService {
 
   // Filtrer les posts selon l'émotion et la cause pour améliorer la pertinence
   private filterPostsByEmotionAndCause(posts: Post[], emotion?: string, cause?: string): Post[] {
-    // Des règles simples pour adapter le contenu à l'émotion (dans un vrai système, ce serait beaucoup plus sophistiqué)
-    if (emotion) {
-      const positiveEmotions = ['HAPPY', 'JOYFUL', 'EXCITED', 'SATISFIED', 'CONFIDENT'];
-      const negativeEmotions = ['SAD', 'MELANCHOLIC', 'DISAPPOINTED', 'ANGRY', 'FRUSTRATED', 'ANXIOUS'];
+    // Si pas d'émotion ni de cause, pas de filtrage spécial
+    if (!emotion && !cause) {
+      return posts;
+    }
+    
+    // Les posts déjà générés par OpenAI sont censés être adaptés
+    // Nous allons simplement les réorganiser en fonction de la priorité
+    
+    // Définir des priorités selon les combinaisons émotion/cause
+    let priorities: { [key: string]: number } = {};
+    
+    // Mapper les types d'émotions à des catégories générales
+    const positiveEmotions = ['HAPPY', 'JOYFUL', 'EXCITED', 'SATISFIED', 'CONFIDENT'];
+    const negativeEmotions = ['SAD', 'MELANCHOLIC', 'DISAPPOINTED', 'ANGRY', 'FRUSTRATED', 'ANXIOUS'];
+    const lowEnergyEmotions = ['TIRED', 'EXHAUSTED', 'MELANCHOLIC', 'SAD'];
+    
+    // Mapper les causes à des catégories
+    const physicalCauses = ['SPORT', 'EXERCISE', 'TRAINING', 'HEALTH'];
+    const relationalCauses = ['FAMILY', 'RELATION', 'FRIENDS', 'SOCIAL'];
+    const workCauses = ['WORK', 'CAREER', 'JOB', 'STUDY', 'EDUCATION'];
+    const financialCauses = ['MONEY', 'FINANCES', 'ECONOMIC'];
+    
+    // Déterminer des priorités de contenu en fonction des combinaisons émotion/cause
+    if (emotion && cause) {
+      const emotionUpper = emotion.toUpperCase();
+      const causeUpper = cause.toUpperCase();
       
-      if (positiveEmotions.includes(emotion)) {
-        // Pour les émotions positives, favoriser les routes et événements
-        posts.sort((a, b) => {
-          if ((a.type === 'ROUTE' || a.type === 'EVENT') && (b.type !== 'ROUTE' && b.type !== 'EVENT')) {
-            return -1;
-          } else if ((b.type === 'ROUTE' || b.type === 'EVENT') && (a.type !== 'ROUTE' && a.type !== 'EVENT')) {
-            return 1;
-          }
-          return 0;
-        });
-      } else if (negativeEmotions.includes(emotion)) {
-        // Pour les émotions négatives, favoriser les articles scientifiques et citations
-        posts.sort((a, b) => {
-          if ((a.type === 'SCIENTIFIC' || a.type === 'QUOTE') && (b.type !== 'SCIENTIFIC' && b.type !== 'QUOTE')) {
-            return -1;
-          } else if ((b.type === 'SCIENTIFIC' || b.type === 'QUOTE') && (a.type !== 'SCIENTIFIC' && a.type !== 'QUOTE')) {
-            return 1;
-          }
-          return 0;
-        });
+      // Combinaisons spécifiques émotion/cause
+      if (positiveEmotions.includes(emotionUpper)) {
+        if (physicalCauses.some(c => causeUpper.includes(c))) {
+          // Positif + sport : routes plus difficiles, événements sportifs
+          priorities = { 'ROUTE': 4, 'EVENT': 3, 'QUOTE': 2, 'SCIENTIFIC': 1 };
+        } else if (relationalCauses.some(c => causeUpper.includes(c))) {
+          // Positif + relations : événements sociaux, marche collective
+          priorities = { 'EVENT': 4, 'ROUTE': 3, 'QUOTE': 2, 'SCIENTIFIC': 1 };
+        } else if (workCauses.some(c => causeUpper.includes(c))) {
+          // Positif + travail : articles scientifiques sur équilibre travail et marche
+          priorities = { 'SCIENTIFIC': 4, 'ROUTE': 3, 'QUOTE': 2, 'EVENT': 1 };
+        }
+      } else if (negativeEmotions.includes(emotionUpper)) {
+        if (physicalCauses.some(c => causeUpper.includes(c))) {
+          // Négatif + sport : articles scientifiques sur récupération, routes faciles
+          priorities = { 'SCIENTIFIC': 4, 'ROUTE': 3, 'QUOTE': 2, 'EVENT': 1 };
+        } else if (relationalCauses.some(c => causeUpper.includes(c))) {
+          // Négatif + relations : citations réconfortantes, marche solitaire
+          priorities = { 'QUOTE': 4, 'ROUTE': 3, 'SCIENTIFIC': 2, 'EVENT': 1 };
+        } else if (workCauses.some(c => causeUpper.includes(c))) {
+          // Négatif + travail : citations motivantes, articles sur le stress
+          priorities = { 'QUOTE': 4, 'SCIENTIFIC': 3, 'ROUTE': 2, 'EVENT': 1 };
+        } else if (financialCauses.some(c => causeUpper.includes(c))) {
+          // Négatif + finances : marche gratuite, économique
+          priorities = { 'ROUTE': 4, 'QUOTE': 3, 'SCIENTIFIC': 2, 'EVENT': 1 };
+        }
+      } else if (lowEnergyEmotions.includes(emotionUpper)) {
+        // Basse énergie : routes faciles, détente
+        priorities = { 'ROUTE': 4, 'SCIENTIFIC': 3, 'QUOTE': 2, 'EVENT': 1 };
       }
+    } else if (emotion) {
+      // Si uniquement l'émotion est spécifiée
+      const emotionUpper = emotion.toUpperCase();
+      
+      if (positiveEmotions.includes(emotionUpper)) {
+        // Pour les émotions positives, favoriser les routes et événements
+        priorities = { 'ROUTE': 3, 'EVENT': 3, 'QUOTE': 2, 'SCIENTIFIC': 1 };
+      } else if (negativeEmotions.includes(emotionUpper)) {
+        // Pour les émotions négatives, favoriser les articles scientifiques et citations
+        priorities = { 'SCIENTIFIC': 3, 'QUOTE': 3, 'ROUTE': 2, 'EVENT': 1 };
+      } else if (lowEnergyEmotions.includes(emotionUpper)) {
+        // Pour la fatigue, favoriser les routes courtes et faciles
+        priorities = { 'ROUTE': 3, 'SCIENTIFIC': 2, 'QUOTE': 2, 'EVENT': 1 };
+      }
+    } else if (cause) {
+      // Si uniquement la cause est spécifiée
+      const causeUpper = cause.toUpperCase();
+      
+      if (physicalCauses.some(c => causeUpper.includes(c))) {
+        // Cause liée au sport : routes et articles scientifiques
+        priorities = { 'ROUTE': 3, 'SCIENTIFIC': 3, 'EVENT': 2, 'QUOTE': 1 };
+      } else if (relationalCauses.some(c => causeUpper.includes(c))) {
+        // Cause liée aux relations : événements sociaux
+        priorities = { 'EVENT': 3, 'QUOTE': 2, 'ROUTE': 2, 'SCIENTIFIC': 1 };
+      } else if (workCauses.some(c => causeUpper.includes(c))) {
+        // Cause liée au travail : équilibre travail-vie personnelle
+        priorities = { 'SCIENTIFIC': 3, 'QUOTE': 2, 'ROUTE': 2, 'EVENT': 1 };
+      } else if (financialCauses.some(c => causeUpper.includes(c))) {
+        // Cause liée aux finances : activités gratuites
+        priorities = { 'ROUTE': 3, 'SCIENTIFIC': 2, 'QUOTE': 2, 'EVENT': 1 };
+      }
+    }
+    
+    // Si des priorités spécifiques ont été définies, trier les posts en conséquence
+    if (Object.keys(priorities).length > 0) {
+      posts.sort((a, b) => {
+        const priorityA = priorities[a.type] || 0;
+        const priorityB = priorities[b.type] || 0;
+        return priorityB - priorityA;
+      });
     }
     
     // Ajouter l'émotion et la cause aux tags si elles sont présentes
@@ -399,115 +472,240 @@ class OpenAIService {
         id: 'sci-3',
         type: 'SCIENTIFIC',
         title: 'Le jogging matinal améliore la qualité du sommeil',
-        content: 'Une étude clinique sur 5 ans montre que les personnes pratiquant le jogging avant 9h du matin ont un sommeil plus profond et réparateur, avec 27% moins de réveils nocturnes que les non-coureurs.',
-        imageUrl: '/images/posts/morning-jog.jpg',
+        content: 'Une étude sur 500 adultes montre que 20 minutes de jogging le matin augmente la qualité du sommeil et réduit le temps d\'endormissement de 37%. L\'exposition à la lumière naturelle joue un rôle crucial dans ce processus.',
+        imageUrl: '/images/posts/morning-running.jpg',
         author: 'Dr. Sophie Martin',
+        date: '2025-03-02',
+        source: 'Sleep Medicine Journal',
+        tags: ['sommeil', 'jogging', 'santé']
+      },
+      {
+        id: 'sci-4',
+        type: 'SCIENTIFIC',
+        title: 'Marcher pour gérer la pression au travail',
+        content: 'Une étude menée auprès de cadres stressés montre que 15 minutes de marche pendant la pause déjeuner réduit le niveau de stress professionnel de 29% et améliore la capacité de prise de décision l\'après-midi.',
+        imageUrl: '/images/posts/work-stress.jpg',
+        author: 'Dr. Jean Moreau',
+        date: '2025-01-15',
+        source: 'Journal of Occupational Health',
+        tags: ['travail', 'stress', 'productivité']
+      },
+      {
+        id: 'sci-5',
+        type: 'SCIENTIFIC',
+        title: 'Relations sociales améliorées grâce à la marche en groupe',
+        content: 'Des psychologues ont démontré que participer à des marches en groupe peut renforcer les liens sociaux et diminuer les sentiments de solitude. Les participants ont rapporté une amélioration de 42% dans leurs relations interpersonnelles.',
+        imageUrl: '/images/posts/group-walking.jpg',
+        author: 'Dr. Claire Dupont',
+        date: '2025-02-08',
+        source: 'Journal of Social Psychology',
+        tags: ['relations', 'solitude', 'groupe', 'social']
+      },
+      {
+        id: 'sci-6',
+        type: 'SCIENTIFIC',
+        title: 'Marcher lentement pour économiser de l\'énergie et de l\'argent',
+        content: 'Des chercheurs en économie comportementale suggèrent que remplacer les courts trajets en voiture par la marche peut faire économiser jusqu\'à 500€ par an en carburant et frais de stationnement, tout en améliorant la santé.',
+        imageUrl: '/images/posts/save-money.jpg',
+        author: 'Prof. Marc Lecomte',
         date: '2025-03-05',
-        source: 'Sleep Health Journal',
-        tags: ['sommeil', 'jogging', 'routine matinale']
+        source: 'Journal of Consumer Economics',
+        tags: ['économies', 'finances', 'transport', 'budget']
       },
       
       // QUOTE POSTS
       {
         id: 'quote-1',
         type: 'QUOTE',
-        content: 'Le voyage de mille lieues commence toujours par un premier pas.',
-        author: 'Lao Tseu',
-        backgroundColor: '#4A6FA5',
-        tags: ['motivation', 'début', 'persévérance']
+        content: 'Marcher est la meilleure médecine de l\'homme.',
+        author: 'Hippocrate',
+        backgroundColor: '#E2F4FF',
+        tags: ['inspiration', 'santé', 'médecine']
       },
       {
         id: 'quote-2',
         type: 'QUOTE',
-        content: 'Chaque pas est un pas en avant, peu importe sa taille.',
-        author: 'Anonyme',
-        backgroundColor: '#6B5B95',
-        tags: ['progrès', 'motivation', 'quotidien']
+        content: 'Tous les véritables grands penseurs ont marché beaucoup.',
+        author: 'Friedrich Nietzsche',
+        backgroundColor: '#FFF4E2',
+        tags: ['philosophie', 'réflexion', 'pensée']
       },
       {
         id: 'quote-3',
         type: 'QUOTE',
-        content: 'La seule personne que tu dois dépasser est celle que tu étais hier.',
-        author: 'Anonyme',
-        backgroundColor: '#878C36',
-        tags: ['challenge', 'amélioration', 'compétition']
+        content: 'La marche est l\'activité humaine par excellence. La marche c\'est la liberté.',
+        author: 'Jacques Lacarrière',
+        backgroundColor: '#E2FFE4',
+        tags: ['liberté', 'philosophie']
+      },
+      {
+        id: 'quote-4',
+        type: 'QUOTE',
+        content: 'À chaque pas que tu fais pour te libérer de ton travail stressant, tu avances vers la sérénité.',
+        author: 'Maria Gonzalez',
+        backgroundColor: '#F5E2FF',
+        tags: ['travail', 'stress', 'sérénité']
+      },
+      {
+        id: 'quote-5',
+        type: 'QUOTE',
+        content: 'La marche en groupe tisse des liens que même le temps ne peut défaire.',
+        author: 'Robert Johnson',
+        backgroundColor: '#FFEDE2',
+        tags: ['relations', 'amitié', 'groupe']
+      },
+      {
+        id: 'quote-6',
+        type: 'QUOTE',
+        content: 'Marcher est gratuit. Le sourire qui en résulte est inestimable.',
+        author: 'Emma Thompson',
+        backgroundColor: '#E2FFFC',
+        tags: ['économie', 'finances', 'bonheur']
       },
       
       // ROUTE POSTS
       {
         id: 'route-1',
         type: 'ROUTE',
-        title: 'Sentier du Lac Bleu',
-        location: 'Parc National des Écrins',
-        distance: 5.2,
-        duration: 90,
+        title: 'Sentier du Lac Tranquille',
+        location: 'Parc National des Cèdres',
+        distance: 4.5,
+        duration: 60,
         difficulty: 'MEDIUM',
-        description: 'Une randonnée magnifique autour du Lac Bleu avec des vues panoramiques sur les montagnes environnantes. Idéal pour une matinée revigorante.',
-        imageUrl: '/images/posts/blue-lake.jpg',
-        tags: ['nature', 'montagne', 'lac', 'vue panoramique']
+        description: 'Un magnifique parcours autour du lac, offrant des vues panoramiques et des zones ombragées idéales pour la méditation en mouvement.',
+        imageUrl: '/images/routes/lake-path.jpg',
+        tags: ['nature', 'lac', 'méditation']
       },
       {
         id: 'route-2',
         type: 'ROUTE',
-        title: 'Circuit urbain du Vieux Port',
-        location: 'Marseille',
-        distance: 4.0,
-        duration: 60,
-        difficulty: 'EASY',
-        description: 'Un parcours urbain qui vous fait découvrir le patrimoine historique de Marseille tout en profitant de la vue sur la Méditerranée.',
-        imageUrl: '/images/posts/marseille-port.jpg',
-        tags: ['urbain', 'mer', 'histoire', 'facile']
+        title: 'Boucle des Collines Verdoyantes',
+        location: 'Réserve Naturelle des Hauteurs',
+        distance: 8.2,
+        duration: 120,
+        difficulty: 'HARD',
+        description: 'Un parcours exigeant à travers les collines qui récompensera vos efforts par des panoramas exceptionnels. Idéal pour se dépasser.',
+        imageUrl: '/images/routes/hills-route.jpg',
+        tags: ['défi', 'collines', 'panorama']
       },
       {
         id: 'route-3',
         type: 'ROUTE',
-        title: 'Boucle de la Forêt des Cèdres',
-        location: 'Mont Ventoux',
-        distance: 7.8,
-        duration: 150,
-        difficulty: 'HARD',
-        description: 'Un parcours exigeant à travers la magnifique forêt de cèdres du Mont Ventoux. Dénivelé important mais récompensé par des paysages à couper le souffle.',
-        imageUrl: '/images/posts/cedar-forest.jpg',
-        tags: ['forêt', 'dénivelé', 'nature sauvage', 'challenge']
+        title: 'Promenade du Canal Historique',
+        location: 'Centre-Ville',
+        distance: 2.8,
+        duration: 35,
+        difficulty: 'EASY',
+        description: 'Une douce promenade le long du canal traversant la ville, passant par des monuments historiques et des jardins publics.',
+        imageUrl: '/images/routes/canal-walk.jpg',
+        tags: ['urbain', 'histoire', 'détente']
+      },
+      {
+        id: 'route-4',
+        type: 'ROUTE',
+        title: 'Pause Déjeuner Express',
+        location: 'Quartier des Affaires',
+        distance: 1.5,
+        duration: 15,
+        difficulty: 'EASY',
+        description: 'Circuit court idéal pour une pause pendant la journée de travail. Inclut des espaces verts et des bancs pour se reposer.',
+        imageUrl: '/images/routes/lunch-break.jpg',
+        tags: ['travail', 'pause', 'rapide']
+      },
+      {
+        id: 'route-5',
+        type: 'ROUTE',
+        title: 'Parcours de la Convivialité',
+        location: 'Parc Municipal',
+        distance: 3.0,
+        duration: 45,
+        difficulty: 'EASY',
+        description: 'Route circulaire bien aménagée, parfaite pour marcher en groupe. Nombreux points de rencontre et aires de pique-nique.',
+        imageUrl: '/images/routes/social-path.jpg',
+        tags: ['groupe', 'social', 'famille']
+      },
+      {
+        id: 'route-6',
+        type: 'ROUTE',
+        title: 'Circuit Économique des Marchés',
+        location: 'Centre-Ville',
+        distance: 2.5,
+        duration: 40,
+        difficulty: 'EASY',
+        description: 'Parcours reliant les principaux marchés locaux où vous pourrez trouver des produits frais à prix abordables. Idéal pour faire ses courses à pied.',
+        imageUrl: '/images/routes/market-route.jpg',
+        tags: ['économie', 'marché', 'shopping']
       },
       
       // EVENT POSTS
       {
         id: 'event-1',
         type: 'EVENT',
-        title: 'Marathon de Paris 2025',
-        date: '2025-04-06',
-        location: 'Paris',
-        description: 'Le marathon mythique de la capitale française vous emmène à travers les monuments emblématiques de Paris. Parcours plat et rapide, idéal pour réaliser un record personnel.',
-        imageUrl: '/images/posts/paris-marathon.jpg',
-        registrationLink: 'https://www.marathondeparis.fr',
-        tags: ['marathon', 'compétition', 'urban', 'international']
+        title: 'Marche Méditative au Lever du Soleil',
+        date: new Date(Date.now() + 7 * 86400000).toISOString(),
+        location: 'Parc de la Sérénité',
+        description: 'Rejoignez notre guide pour une marche en pleine conscience au lever du soleil. Techniques de respiration et méditation incluses.',
+        imageUrl: '/images/events/sunrise-walk.jpg',
+        registrationLink: 'https://example.com/events/sunrise-walk',
+        tags: ['méditation', 'bien-être', 'aube']
       },
       {
         id: 'event-2',
         type: 'EVENT',
-        title: 'Marche collective pour la Santé Mentale',
-        date: '2025-05-18',
-        location: 'Lyon',
-        description: 'Une marche solidaire de 5km pour sensibiliser à l\'importance de la santé mentale. Accessible à tous, familles bienvenues. Les fonds récoltés seront reversés à des associations.',
-        imageUrl: '/images/posts/mental-health-walk.jpg',
-        registrationLink: 'https://www.marchesantementale.fr',
-        tags: ['solidarité', 'santé mentale', 'famille', 'accessible']
+        title: 'Défi Randonnée des Montagnes',
+        date: new Date(Date.now() + 14 * 86400000).toISOString(),
+        location: 'Massif des Alpines',
+        description: 'Un événement sportif pour les amateurs de défi. Trois parcours de difficulté croissante avec ravitaillement et encadrement.',
+        imageUrl: '/images/events/mountain-challenge.jpg',
+        registrationLink: 'https://example.com/events/mountain-challenge',
+        tags: ['compétition', 'montagne', 'défi']
       },
       {
         id: 'event-3',
         type: 'EVENT',
-        title: 'Trail des Calanques',
-        date: '2025-06-22',
-        location: 'Cassis',
-        description: 'Un trail exceptionnel dans le cadre idyllique du Parc National des Calanques. Plusieurs distances disponibles: 15km, 25km et 45km pour les plus courageux.',
-        imageUrl: '/images/posts/calanques-trail.jpg',
-        registrationLink: 'https://www.trailcalanques.fr',
-        tags: ['trail', 'nature', 'mer', 'challenge']
+        title: 'Festival de la Marche Urbaine',
+        date: new Date(Date.now() + 21 * 86400000).toISOString(),
+        location: 'Place Centrale',
+        description: 'Un weekend dédié à la découverte de la ville à pied. Tours guidés, animations et conférences sur les bienfaits de la marche en ville.',
+        imageUrl: '/images/events/urban-walk-fest.jpg',
+        registrationLink: 'https://example.com/events/urban-walk-festival',
+        tags: ['festival', 'urbain', 'culture']
+      },
+      {
+        id: 'event-4',
+        type: 'EVENT',
+        title: 'Atelier Anti-Stress pour Professionnels',
+        date: new Date(Date.now() + 10 * 86400000).toISOString(),
+        location: 'Parc d\'Affaires',
+        description: 'Session spéciale pour les professionnels stressés. Apprenez des techniques de marche anti-stress à intégrer dans votre journée de travail.',
+        imageUrl: '/images/events/stress-relief.jpg',
+        registrationLink: 'https://example.com/events/stress-relief',
+        tags: ['travail', 'stress', 'bien-être']
+      },
+      {
+        id: 'event-5',
+        type: 'EVENT',
+        title: 'Marche Sociale pour Célibataires',
+        date: new Date(Date.now() + 5 * 86400000).toISOString(),
+        location: 'Jardin Botanique',
+        description: 'Une opportunité de rencontrer de nouvelles personnes dans un cadre détendu. Marche suivie d\'un brunch dans un café local.',
+        imageUrl: '/images/events/social-walk.jpg',
+        registrationLink: 'https://example.com/events/social-walk',
+        tags: ['rencontre', 'social', 'célibataires']
+      },
+      {
+        id: 'event-6',
+        type: 'EVENT',
+        title: 'Randonnée Économique: Nature Gratuite',
+        date: new Date(Date.now() + 8 * 86400000).toISOString(),
+        location: 'Forêt Communale',
+        description: 'Découvrez comment profiter de la nature sans dépenser. Conseils sur l\'équipement économique et les activités gratuites en plein air.',
+        imageUrl: '/images/events/free-nature.jpg',
+        registrationLink: 'https://example.com/events/free-nature',
+        tags: ['économie', 'gratuit', 'nature']
       }
     ];
     
-    // Retourner la liste complète des posts fictifs
     return mockPosts;
   }
 }

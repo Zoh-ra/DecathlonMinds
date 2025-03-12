@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import styles from './Chatbot.module.css';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   id: string;
@@ -12,13 +13,22 @@ interface Message {
 // États du chat : initial, sélection d'émotion, sélection de cause, affichage de la réponse
 type ChatStateType = 'initial' | 'selecting_emotion' | 'selecting_reason' | 'chat';
 
-const Chatbot: React.FC<{ initialMessage?: string }> = ({ initialMessage }) => {
+interface ChatbotProps {
+  initialMessage?: string;
+  onBack?: () => void;
+  onClose?: () => void;
+  emotionColor?: string;
+}
+
+const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emotionColor }) => {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatState, setChatState] = useState<ChatStateType>('initial');
   const [selectedEmotion, setSelectedEmotion] = useState('');
-  
+  const [inputValue, setInputValue] = useState('');
+
   // Liste des émotions disponibles
   const emotions = [
     { text: "Heureux(se)", icon: "😊", emotion: "HAPPY" },
@@ -99,18 +109,8 @@ const Chatbot: React.FC<{ initialMessage?: string }> = ({ initialMessage }) => {
 
   // Fonction pour gérer la sélection d'une cause
   const handleCauseSelection = (cause: string) => {
-    // Ajouter le message de sélection de cause
-    setMessages(prev => [...prev, {
-      id: generateUniqueId('user'),
-      text: `La cause est ${cause}`,
-      sender: 'user',
-    }]);
-    
-    // Afficher l'indicateur de chargement
-    setIsTyping(true);
-    
-    // Obtenir une citation adaptée à l'émotion et à la cause
-    fetchReassuranceQuote(selectedEmotion, cause);
+    // Rediriger vers la page de motivation avec les paramètres d'émotion et de cause
+    router.push(`/motivation?emotion=${encodeURIComponent(selectedEmotion)}&cause=${encodeURIComponent(cause)}`);
   };
 
   // Fonction pour obtenir une citation rassurante
@@ -158,28 +158,129 @@ const Chatbot: React.FC<{ initialMessage?: string }> = ({ initialMessage }) => {
     }
   };
 
+  const formatMessage = (message: string) => {
+    // Formatage des liens dans les messages
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return message.replace(urlRegex, (url) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+  };
+
+  const getBotMessageStyle = () => {
+    if (emotionColor) {
+      return {
+        backgroundColor: `${emotionColor}80`,
+        borderColor: emotionColor,
+        boxShadow: `0 1px 8px ${emotionColor}40`
+      };
+    }
+    return {};
+  };
+
+  const getEmojiBgStyle = () => {
+    if (emotionColor) {
+      return {
+        backgroundColor: `rgba(255, 255, 255, 0.2)`,
+        backdropFilter: 'blur(8px)',
+        border: `1px solid rgba(255, 255, 255, 0.3)`,
+        boxShadow: `0 4px 15px rgba(0, 0, 0, 0.15)`,
+        color: 'white'
+      };
+    }
+    return {
+      backgroundColor: `rgba(255, 255, 255, 0.2)`,
+      backdropFilter: 'blur(8px)',
+      border: `1px solid rgba(255, 255, 255, 0.3)`,
+      boxShadow: `0 4px 15px rgba(0, 0, 0, 0.15)`,
+      color: 'white'
+    };
+  };
+
+  const getEmojiContainerStyle = () => {
+    if (emotionColor) {
+      return {
+        backgroundColor: 'transparent',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: 'transparent',
+      border: 'none'
+    };
+  };
+
+  const getButtonStyle = () => {
+    if (emotionColor) {
+      return {
+        backgroundColor: `${emotionColor}50`,
+        borderColor: emotionColor,
+        color: 'white'
+      };
+    }
+    return {};
+  };
+
   return (
-    <div className={styles.chatbot}>
+    <div 
+      className={styles.chatbot} 
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        border: 'none',
+        outline: 'none',
+        boxShadow: 'none',
+        zIndex: 1000,
+        margin: 0,
+        padding: 0,
+        background: emotionColor 
+          ? `linear-gradient(135deg, ${emotionColor} 0%, #180533 100%)` 
+          : 'linear-gradient(135deg, #300e5f 0%, #180533 100%)'
+      }}
+    >
+      <div className={styles.chatHeader}>
+        <button 
+          onClick={onBack} 
+          className={styles.backButton}
+          aria-label="Retour à l'écran d'accueil"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
       <div className={styles.messagesContainer}>
         {/* Affichage des messages */}
-        {messages.map((message) => (
-          <div 
-            key={message.id} 
-            className={`${styles.messageContainer} ${
-              message.sender === 'user' ? styles.userMessageContainer : styles.botMessageContainer
-            }`}
-          >
+        {messages.map((message, index) => (
+          <div key={index} className={styles.messageContainer}>
             <div
-              className={`${message.sender === 'user' ? styles.userMessage : styles.botMessage}`}
-            >
-              {message.text}
-            </div>
+              className={`${styles.message} ${
+                message.sender === 'user' ? styles.userMessage : styles.botMessage
+              }`}
+              style={message.sender !== 'user' ? getBotMessageStyle() : {}}
+              dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
+            ></div>
           </div>
         ))}
         
         {/* Affichage des émojis d'émotion */}
         {chatState === 'selecting_emotion' && (
-          <div className={styles.emojiCauseContainer}>
+          <div className={styles.emojiCauseContainer} style={getEmojiContainerStyle()}>
             {emotions.map((item, index) => (
               <div key={index} className={styles.emojiWrapper}>
                 <button 
@@ -197,17 +298,19 @@ const Chatbot: React.FC<{ initialMessage?: string }> = ({ initialMessage }) => {
         {/* Affichage des émojis de cause */}
         {chatState === 'selecting_reason' && (
           <div className={styles.emojiCauseContainer}>
-            {emotionCauses.map((item, index) => (
-              <div key={index} className={styles.emojiWrapper}>
-                <button 
-                  className={styles.emojiCauseButton}
-                  onClick={() => handleCauseSelection(item.cause)}
+            <div className={styles.causesGrid}>
+              {emotionCauses.map((cause) => (
+                <div 
+                  key={cause.cause} 
+                  className={styles.reasonOption} 
+                  onClick={() => handleCauseSelection(cause.cause)}
+                  style={getEmojiBgStyle()}
                 >
-                  {item.emoji}
-                </button>
-                <div className={styles.emojiLabel}>{item.label}</div>
-              </div>
-            ))}
+                  <div className={styles.reasonEmoji}>{cause.emoji}</div>
+                  <div className={styles.reasonLabel}>{cause.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
         
@@ -223,6 +326,7 @@ const Chatbot: React.FC<{ initialMessage?: string }> = ({ initialMessage }) => {
             </div>
           </div>
         )}
+        
         <div ref={messagesEndRef} />
       </div>
     </div>

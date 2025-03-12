@@ -15,29 +15,26 @@ export default function FeedPage() {
   const searchParams = useSearchParams();
   
   // Récupérer l'émotion et la cause des paramètres d'URL
-  const emotion = searchParams.get('emotion');
-  const cause = searchParams.get('cause');
+  const emotion = searchParams.get('emotion') || undefined;
+  const cause = searchParams.get('cause') || undefined;
   
-  // Message adapté à l'émotion de l'utilisateur
+  // Fonction pour définir un message adapté à l'émotion
   const getEmotionMessage = () => {
-    if (!emotion) return null;
+    if (!emotion) return "Découvrez notre sélection de contenu adapté.";
     
-    switch (emotion.toLowerCase()) {
-      case 'happy':
-      case 'joy':
-        return "Excellent ! Nous avons sélectionné du contenu pour entretenir votre bonne humeur.";
-      case 'sad':
-      case 'sadness':
-        return "Nous avons préparé du contenu qui pourrait vous aider à vous sentir mieux.";
-      case 'angry':
-      case 'anger':
-        return "Voici des suggestions qui pourraient vous aider à canaliser cette énergie.";
-      case 'anxious':
-      case 'anxiety':
-      case 'worried':
-        return "Respirez profondément. Nous avons trouvé du contenu pour vous aider à vous détendre.";
-      case 'tired':
-      case 'fatigue':
+    switch (emotion) {
+      case 'HAPPY':
+      case 'JOYFUL':
+      case 'CONFIDENT':
+        return "Super ! Continuez sur cette lancée positive avec notre sélection de contenu.";
+      case 'SAD':
+      case 'MELANCHOLIC':
+        return "Nous avons sélectionné du contenu pour vous réconforter et vous inspirer.";
+      case 'ANXIOUS':
+      case 'FRUSTRATED':
+        return "Respirez profondément. Voici du contenu qui pourrait vous aider à vous apaiser.";
+      case 'TIRED':
+      case 'EXHAUSTED':
         return "Prenez votre temps. Nous avons sélectionné du contenu adapté pour vous revitaliser.";
       default:
         return `Voici du contenu adapté à votre humeur : ${emotion}.`;
@@ -57,9 +54,6 @@ export default function FeedPage() {
       if (emotion) url += `emotion=${encodeURIComponent(emotion)}&`;
       if (cause) url += `cause=${encodeURIComponent(cause)}&`;
       
-      // Ajouter le filtre actif s'il n'est pas sur 'ALL'
-      if (activeFilter !== 'ALL') url += `filter=${encodeURIComponent(activeFilter)}&`;
-      
       // Récupérer les posts
       const response = await fetch(url);
       
@@ -77,24 +71,22 @@ export default function FeedPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [emotion, cause, activeFilter]);
+  }, [emotion, cause]);
   
   // Filtrer les posts par type
   const handleFilterChange = (filter: PostType | 'ALL') => {
     setActiveFilter(filter);
-    
-    // Si le filtre a changé pour autre chose que 'ALL',
-    // récupérer de nouveaux posts avec le filtre
-    if (filter !== activeFilter) {
-      // Nous allons rafraîchir les posts avec le nouveau filtre
-      fetchPosts();
-    }
   };
   
   // Charger les posts au chargement initial ou quand les paramètres changent
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts, emotion, cause, activeFilter]);
+  }, [fetchPosts, emotion, cause]);
+
+  // Filtrer les posts affichés en fonction du type sélectionné
+  const filteredPosts = activeFilter === 'ALL'
+    ? posts
+    : posts.filter(post => post.type === activeFilter);
 
   // Rendu du composant
   return (
@@ -163,13 +155,12 @@ export default function FeedPage() {
               Réessayer
             </button>
           </div>
-        ) : posts.length === 0 ? (
+        ) : filteredPosts.length === 0 ? (
           <div className={styles.emptyContainer}>
             <p>Aucun post ne correspond à vos critères actuels.</p>
             <button 
               onClick={() => {
                 setActiveFilter('ALL');
-                fetchPosts();
               }}
               className={styles.resetButton}
             >
@@ -178,7 +169,7 @@ export default function FeedPage() {
           </div>
         ) : (
           <div className={styles.postsGrid}>
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
               <FeedPostCard key={post.id} post={post} />
             ))}
           </div>

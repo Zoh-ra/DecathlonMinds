@@ -4,19 +4,67 @@ import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import FeedPostCard from '../../components/Feed/FeedPostCard';
 import { Post, PostType } from '../../types/feed';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<PostType | 'ALL'>('ALL');
+  const [darkMode, setDarkMode] = useState(true);
+  
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const emotion = searchParams.get('emotion');
+  const cause = searchParams.get('cause');
+
+  // Detecter le mode jour/nuit via media query
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setDarkMode(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setDarkMode(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        // Dans un environnement de production, ce serait une vraie API
+        // Dans un environnement de production, ce serait une vraie API qui utiliserait l'émotion et la cause
+        // pour adapter les résultats affichés
         const response = await fetch('/api/feed/posts');
         const data = await response.json();
-        setPosts(data);
+        
+        // Si l'émotion est présente, on filtre d'abord en fonction de l'émotion
+        let filteredData = data;
+        
+        if (emotion) {
+          // Logique de filtrage basée sur l'émotion
+          // Par exemple, pour des émotions positives (HAPPY, JOYFUL), on favorise les parcours et événements
+          // Pour des émotions négatives (SAD, ANXIOUS), on favorise les articles scientifiques et citations
+          const positiveEmotions = ['HAPPY', 'JOYFUL', 'EXCITED', 'SATISFIED', 'CONFIDENT'];
+          const negativeEmotions = ['SAD', 'MELANCHOLIC', 'DISAPPOINTED', 'ANGRY', 'FRUSTRATED', 'ANXIOUS'];
+          
+          if (positiveEmotions.includes(emotion)) {
+            // Prioriser les événements et parcours pour les émotions positives
+            filteredData = [...data.filter((p: Post) => p.type === 'EVENT' || p.type === 'ROUTE'), 
+                            ...data.filter((p: Post) => p.type !== 'EVENT' && p.type !== 'ROUTE')];
+            // Définir le filtre par défaut sur ROUTE pour les émotions positives
+            setFilter('ROUTE');
+          } else if (negativeEmotions.includes(emotion)) {
+            // Prioriser les articles scientifiques et citations pour les émotions négatives
+            filteredData = [...data.filter((p: Post) => p.type === 'SCIENTIFIC' || p.type === 'QUOTE'),
+                            ...data.filter((p: Post) => p.type !== 'SCIENTIFIC' && p.type !== 'QUOTE')];
+            // Définir le filtre par défaut sur SCIENTIFIC pour les émotions négatives
+            setFilter('SCIENTIFIC');
+          }
+        }
+        
+        setPosts(filteredData);
       } catch (error) {
         console.error('Error fetching posts:', error);
         // Utiliser des données fictives en cas d'erreur
@@ -27,19 +75,44 @@ export default function FeedPage() {
     };
 
     fetchPosts();
-  }, []);
+  }, [emotion, cause]);
 
   const filteredPosts = filter === 'ALL' 
     ? posts 
-    : posts.filter(post => post.type === filter);
+    : posts.filter((post: Post) => post.type === filter);
 
   return (
-    <main className={styles.main}>
+    <main className={`${styles.main} ${!darkMode ? styles.lightMode : ''}`}
+      style={{ 
+        background: darkMode 
+          ? 'linear-gradient(135deg, #300e5f 0%, #180533 100%)' 
+          : 'linear-gradient(135deg, #f0f4ff 0%, #e0e8ff 100%)',
+        color: darkMode ? 'white' : '#333'
+      }}
+    >
       <div className={styles.container}>
-        <h1 className={styles.title}>Décathlon Minds - Fil d&apos;actualité</h1>
-        <p className={styles.description}>
-          Découvrez les dernières actualités sur la marche, le jogging, et plus encore !
-        </p>
+        <div className={styles.logoContainer}>
+          <Image 
+            src="/images/logo/Logo.png" 
+            alt="myMind Logo" 
+            width={80} 
+            height={80} 
+            style={{ objectFit: 'contain' }} 
+          />
+          <div className={styles.backButton} onClick={() => router.back()}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>Retour</span>
+          </div>
+        </div>
+        
+        {emotion && (
+          <p className={styles.emotionInfo}>
+            Contenu adapté à votre humeur: <strong>{emotion}</strong>
+            {cause && <span> liée à <strong>{cause}</strong></span>}
+          </p>
+        )}
         
         <div className={styles.filters}>
           <button 
@@ -81,7 +154,7 @@ export default function FeedPage() {
             {filteredPosts.length === 0 ? (
               <div className={styles.noResults}>Aucun contenu à afficher dans cette catégorie.</div>
             ) : (
-              filteredPosts.map((post) => (
+              filteredPosts.map((post: Post) => (
                 <FeedPostCard key={post.id} post={post} />
               ))
             )}

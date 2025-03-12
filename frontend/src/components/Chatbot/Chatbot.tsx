@@ -194,7 +194,22 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
 
   // Redirection vers la page feed
   const handleStartJourney = () => {
-    router.push('/feed');
+    // Rechercher la cause dans les messages
+    const lastCauseMessage = [...messages].reverse()
+      .find(msg => msg.sender === 'user' && msg.text.startsWith('Cette émotion est liée à :'));
+    
+    // Extraire la cause du message
+    let cause = '';
+    if (lastCauseMessage) {
+      cause = lastCauseMessage.text.replace('Cette émotion est liée à : ', '');
+    }
+    
+    // Trouver la valeur de l'émotion (HAPPY, SAD, etc.)
+    const emotionObject = emotions.find(e => e.text === selectedEmotion);
+    const emotionCode = emotionObject ? emotionObject.emotion : '';
+    
+    // Rediriger vers la page feed avec les paramètres d'émotion et de cause
+    router.push(`/feed?emotion=${emotionCode}&cause=${encodeURIComponent(cause)}`);
   };
 
   // Styles conditionnels basés sur emotionColor

@@ -2,158 +2,119 @@
 
 import { useState, useRef, useEffect } from 'react';
 import styles from './Chatbot.module.css';
-import EmotionSelector from './EmotionSelector';
-import ReasonSelector from './ReasonSelector';
 
-// Types
-type Message = {
+interface Message {
   id: string;
   text: string;
   sender: 'user' | 'bot';
-  isEmotionSelector?: boolean;
-  isReasonSelector?: boolean;
-  isFinalResponse?: boolean;
-};
+}
 
-type EmotionType = {
-  emoji: string;
-  name: string;
-  label: string;
-};
+// États du chat : initial, sélection d'émotion, sélection de cause, affichage de la réponse
+type ChatStateType = 'initial' | 'selecting_emotion' | 'selecting_reason' | 'chat';
 
-type ReasonType = {
-  emoji: string;
-  name: string;
-  label: string;
-};
-
-type ChatResponse = {
-  emotion: string;
-  reason: string;
-  datetime: string;
-};
-
-// Emotions list with emojis
-const emotions: EmotionType[] = [
-  { emoji: '😊', name: 'HAPPY', label: 'Heureux(se)' },
-  { emoji: '😔', name: 'SAD', label: 'Triste' },
-  { emoji: '😡', name: 'ANGRY', label: 'En colère' },
-  { emoji: '😰', name: 'ANXIOUS', label: 'Anxieux(se)' },
-  { emoji: '😴', name: 'TIRED', label: 'Fatigué(e)' },
-  { emoji: '🤔', name: 'CONFUSED', label: 'Confus(e)' },
-  { emoji: '😌', name: 'RELAXED', label: 'Détendu(e)' },
-  { emoji: '🥳', name: 'EXCITED', label: 'Excité(e)' },
-];
-
-// Reasons list with emojis
-const reasons: ReasonType[] = [
-  { emoji: '💼', name: 'WORK', label: 'Travail' },
-  { emoji: '❤️', name: 'LOVE', label: 'Amour' },
-  { emoji: '👤', name: 'SELF', label: 'Moi-même' },
-  { emoji: '👪', name: 'FAMILY', label: 'Famille' },
-  { emoji: '🫂', name: 'FRIENDS', label: 'Amis' },
-  { emoji: '💰', name: 'MONEY', label: 'Argent' },
-  { emoji: '🏥', name: 'HEALTH', label: 'Santé' },
-  { emoji: '🌍', name: 'WORLD', label: 'Actualités' },
-];
-
-export default function Chatbot() {
+const Chatbot: React.FC<{ initialMessage?: string }> = ({ initialMessage }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [chatState, setChatState] = useState<'initial' | 'emotion_selected' | 'reason_selected' | 'chat'>('initial');
-  const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(null);
-  const [selectedReason, setSelectedReason] = useState<ReasonType | null>(null);
   const [isTyping, setIsTyping] = useState(false);
-  
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [chatState, setChatState] = useState<ChatStateType>('initial');
+  const [selectedEmotion, setSelectedEmotion] = useState('');
   
-  // Start the conversation when component mounts
-  useEffect(() => {
-    // Introduce the chatbot
-    setTimeout(() => {
-      addBotMessage("Bonjour ! Je suis votre assistant Décathlon Minds.");
-      setTimeout(() => {
-        addBotMessage("Comment vous sentez-vous aujourd'hui ?", true);
-      }, 500);
-    }, 500);
-  }, []);
+  // Liste des émotions disponibles
+  const emotions = [
+    { text: "Heureux(se)", icon: "😊", emotion: "HAPPY" },
+    { text: "Triste", icon: "😔", emotion: "SAD" },
+    { text: "En colère", icon: "😠", emotion: "ANGRY" },
+    { text: "Anxieux(se)", icon: "😰", emotion: "ANXIOUS" },
+    { text: "Fatigué(e)", icon: "😴", emotion: "TIRED" },
+    { text: "Surpris(e)", icon: "😮", emotion: "SURPRISED" },
+    { text: "Calme", icon: "😌", emotion: "CALM" },
+    { text: "Excité(e)", icon: "🤩", emotion: "EXCITED" },
+  ];
+  
+  // Causes possibles par émojis
+  const emotionCauses = [
+    { emoji: "🏃", label: "Sport", cause: "sport" },
+    { emoji: "👨‍👩‍👧‍👦", label: "Famille", cause: "famille" },
+    { emoji: "💼", label: "Travail", cause: "travail" },
+    { emoji: "💔", label: "Relation", cause: "relation" },
+    { emoji: "🏠", label: "Maison", cause: "maison" },
+    { emoji: "💰", label: "Finances", cause: "finances" },
+    { emoji: "🧠", label: "Mental", cause: "mental" },
+    { emoji: "🤔", label: "Autre", cause: "autre" },
+  ];
 
-  // Scroll to bottom of chat
+  // Fonction pour générer un ID unique pour les messages
+  const generateUniqueId = (prefix: string) => {
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  // Initialisation du chat
+  useEffect(() => {
+    if (initialMessage && initialMessage.startsWith("Je me sens ")) {
+      // Cas où on arrive avec une émotion sélectionnée (depuis le bouton de la page Today)
+      const emotion = initialMessage.replace("Je me sens ", "");
+      setSelectedEmotion(emotion);
+      
+      // Afficher le message de l'utilisateur
+      const userMessageId = generateUniqueId('user');
+      setMessages([{
+        id: userMessageId,
+        text: initialMessage,
+        sender: 'user',
+      }]);
+      
+      // Passer à la sélection de la cause
+      setChatState('selecting_reason');
+    } else if (messages.length === 0) {
+      // Message de bienvenue et invitation à sélectionner une émotion
+      setMessages([{
+        id: generateUniqueId('bot'),
+        text: "Bonjour ! Je suis DécathlonMinds, votre compagnon bien-être. Comment vous sentez-vous aujourd'hui ?",
+        sender: 'bot',
+      }]);
+      
+      // Afficher les émojis d'émotions
+      setChatState('selecting_emotion');
+    }
+  }, [initialMessage, messages.length]);
+
+  // Scroll vers le bas à chaque changement de messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Function to add a bot message
-  const addBotMessage = (text: string, isEmotionSelector = false, isReasonSelector = false, isFinalResponse = false) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        id: Date.now().toString(),
-        text,
-        sender: 'bot',
-        isEmotionSelector,
-        isReasonSelector,
-        isFinalResponse
-      },
-    ]);
-  };
-
-  // Function to add a user message
-  const addUserMessage = (text: string) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { id: Date.now().toString(), text, sender: 'user' },
-    ]);
-  };
-
-  // Handle sending messages
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
+  // Fonction pour gérer la sélection d'une émotion
+  const handleEmotionSelection = (emotion: string, emotionName: string) => {
+    // Ajouter le message de l'utilisateur
+    setMessages(prev => [...prev, {
+      id: generateUniqueId('user'),
+      text: `Je me sens ${emotionName}`,
+      sender: 'user',
+    }]);
     
-    addUserMessage(input);
-    setInput('');
+    // Enregistrer l'émotion et passer à la sélection de cause
+    setSelectedEmotion(emotionName);
+    setChatState('selecting_reason');
+  };
+
+  // Fonction pour gérer la sélection d'une cause
+  const handleCauseSelection = (cause: string) => {
+    // Ajouter le message de sélection de cause
+    setMessages(prev => [...prev, {
+      id: generateUniqueId('user'),
+      text: `La cause est ${cause}`,
+      sender: 'user',
+    }]);
+    
+    // Afficher l'indicateur de chargement
     setIsTyping(true);
     
-    // Process based on chat state
-    if (chatState === 'chat') {
-      // Call OpenAI for chat
-      fetchChatResponse(input);
-    }
+    // Obtenir une citation adaptée à l'émotion et à la cause
+    fetchReassuranceQuote(selectedEmotion, cause);
   };
 
-  // Handle emotion selection
-  const handleEmotionSelect = (emotion: EmotionType) => {
-    setSelectedEmotion(emotion);
-    addUserMessage(`${emotion.emoji} ${emotion.label}`);
-    setChatState('emotion_selected');
-    
-    // Save emotion to backend
-    saveEmotionalEntry(emotion.name, null);
-    
-    // Ask about reasons
-    setTimeout(() => {
-      addBotMessage("Savez-vous ce qui vous procure cette émotion ?", false, true);
-    }, 500);
-  };
-
-  // Handle reason selection
-  const handleReasonSelect = (reason: ReasonType) => {
-    setSelectedReason(reason);
-    addUserMessage(`${reason.emoji} ${reason.label}`);
-    setChatState('reason_selected');
-    
-    // Update emotional entry with reason
-    saveEmotionalEntry(selectedEmotion?.name || '', reason.name);
-    
-    // Show appropriate reassuring quote based on emotion and reason
-    setTimeout(() => {
-      fetchReassuranceQuote(selectedEmotion?.name || '', reason.name);
-    }, 500);
-  };
-
-  // Function to fetch reassuring quote
+  // Fonction pour obtenir une citation rassurante
   const fetchReassuranceQuote = async (emotion: string, reason: string) => {
-    setIsTyping(true);
     try {
       const response = await fetch('/api/emotion/quote', {
         method: 'POST',
@@ -164,146 +125,108 @@ export default function Chatbot() {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to get quote');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      addBotMessage(data.quote, false, false, true);
       
-      // Move to chat state
-      setTimeout(() => {
-        addBotMessage("Comment puis-je vous aider davantage aujourd'hui ?");
-        setChatState('chat');
-      }, 1000);
-      
-    } catch (error) {
-      addBotMessage("Je comprends ce que vous ressentez. N'hésitez pas à me parler si vous avez besoin de quelque chose.", false, false, true);
-      setChatState('chat');
-    } finally {
+      // Ajouter la citation aux messages
       setIsTyping(false);
-    }
-  };
-
-  // Function to save emotional entry to backend
-  const saveEmotionalEntry = async (emotion: string, reason: string | null) => {
-    try {
-      const payload: any = {
-        emotionType: emotion,
-        intensityLevel: 'MEDIUM', // Default intensity
-        description: '',
-        weatherData: ''
-      };
-      
-      if (reason) {
-        payload.triggers = reason;
-      }
-      
-      await fetch('/api/emotion/entry', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: generateUniqueId('bot'),
+          text: data.quote,
+          sender: 'bot',
         },
-        body: JSON.stringify(payload),
-      });
+      ]);
       
+      // Préparer pour un nouveau cycle d'interactions
+      setChatState('selecting_emotion');
     } catch (error) {
-      console.error('Error saving emotional entry:', error);
-    }
-  };
-
-  // Function to fetch chat response from OpenAI API
-  const fetchChatResponse = async (userMessage: string) => {
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          emotion: selectedEmotion?.name || '',
-          reason: selectedReason?.name || ''
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get response from chat');
-      }
-      
-      const data = await response.json();
-      addBotMessage(data.response);
-      
-    } catch (error) {
-      addBotMessage("Désolé, je n'ai pas pu traiter votre message. Pouvez-vous réessayer ?");
-    } finally {
+      console.error('Error:', error);
       setIsTyping(false);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: generateUniqueId('bot'),
+          text: "Désolé, je n'ai pas pu obtenir une citation adaptée à votre situation. Comment vous sentez-vous maintenant ?",
+          sender: 'bot',
+        },
+      ]);
+      setChatState('selecting_emotion');
     }
   };
 
   return (
     <div className={styles.chatbot}>
-      <div className={styles.chatMessages}>
+      <div className={styles.messagesContainer}>
+        {/* Affichage des messages */}
         {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`${styles.message} ${
-              message.sender === 'user' ? styles.userMessage : styles.botMessage
+          <div 
+            key={message.id} 
+            className={`${styles.messageContainer} ${
+              message.sender === 'user' ? styles.userMessageContainer : styles.botMessageContainer
             }`}
           >
-            {message.isEmotionSelector ? (
-              <EmotionSelector
-                emotions={emotions}
-                onSelect={handleEmotionSelect}
-              />
-            ) : message.isReasonSelector ? (
-              <ReasonSelector
-                reasons={reasons}
-                onSelect={handleReasonSelect}
-              />
-            ) : (
-              <div className={styles.messageText}>{message.text}</div>
-            )}
+            <div
+              className={`${message.sender === 'user' ? styles.userMessage : styles.botMessage}`}
+            >
+              {message.text}
+            </div>
           </div>
         ))}
+        
+        {/* Affichage des émojis d'émotion */}
+        {chatState === 'selecting_emotion' && (
+          <div className={styles.emojiCauseContainer}>
+            {emotions.map((item, index) => (
+              <div key={index} className={styles.emojiWrapper}>
+                <button 
+                  className={styles.emojiCauseButton}
+                  onClick={() => handleEmotionSelection(item.emotion, item.text)}
+                >
+                  {item.icon}
+                </button>
+                <div className={styles.emojiLabel}>{item.text}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Affichage des émojis de cause */}
+        {chatState === 'selecting_reason' && (
+          <div className={styles.emojiCauseContainer}>
+            {emotionCauses.map((item, index) => (
+              <div key={index} className={styles.emojiWrapper}>
+                <button 
+                  className={styles.emojiCauseButton}
+                  onClick={() => handleCauseSelection(item.cause)}
+                >
+                  {item.emoji}
+                </button>
+                <div className={styles.emojiLabel}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Indicateur de chargement */}
         {isTyping && (
-          <div className={`${styles.message} ${styles.botMessage}`}>
-            <div className={styles.typingIndicator}>
-              <span></span>
-              <span></span>
-              <span></span>
+          <div className={styles.messageContainer}>
+            <div className={styles.botMessage}>
+              <div className={styles.typingIndicator}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className={styles.chatInput}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') handleSendMessage();
-          }}
-          placeholder="Écrivez votre message..."
-          disabled={chatState !== 'chat' && chatState !== 'initial'}
-        />
-        <button onClick={handleSendMessage}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
-      </div>
     </div>
   );
-}
+};
+
+export default Chatbot;

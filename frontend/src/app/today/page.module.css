@@ -1,0 +1,478 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: linear-gradient(135deg, #300e5f 0%, #180533 100%);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.lightMode {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  color: #333;
+}
+
+.lightMode .menuButton, 
+.lightMode .themeButton, 
+.lightMode .suggestionButton, 
+.lightMode .modeButton, 
+.lightMode .inputBar {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.lightMode .inputBar::placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Règle supprimée pour permettre au logo de s'afficher sans conteneur */
+
+.container {
+  width: 100%;
+  max-width: 1000px;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem;
+}
+
+.menuButton, .themeButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menuButton:hover, .themeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Styles for the menu */
+.menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh;
+  background: linear-gradient(135deg, rgba(46, 16, 101, 0.98) 0%, rgba(28, 8, 61, 0.98) 100%);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lightMode .menu {
+  background: linear-gradient(135deg, rgba(245, 245, 245, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.menuHeader {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.lightMode .menuHeader {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.closeButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.lightMode .closeButton {
+  color: #333;
+}
+
+.menuHeader h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.menuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.menuList li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.menuList li button {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 1.1rem 1.5rem;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  position: relative;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.menuList li button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #a370f0;
+  opacity: 0;
+  transform: scaleY(0.5);
+  transition: all 0.3s ease;
+}
+
+.lightMode .menuList li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menuList li:hover button {
+  background: rgba(255, 255, 255, 0.1);
+  padding-left: 2rem;
+}
+
+.menuList li:hover button::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.lightMode .menuList li:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.lightMode .menuList li button {
+  color: #333;
+}
+
+.lightMode .menuList li button::before {
+  background: #6d4cb3;
+}
+
+.assistantContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.assistantIcon {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.assistantText {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.assistantSubtext {
+  font-size: 1rem;
+  opacity: 0.8;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.suggestionsContainer {
+  display: grid;
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column dense;
+  grid-auto-columns: max-content;
+  gap: 0.9rem;
+  margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.5rem 1rem 1.5rem 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  scroll-snap-type: x mandatory;
+  grid-row-gap: 0.9rem;
+  grid-column-gap: 0.4rem;
+}
+
+.suggestionsContainer::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+  display: none;
+}
+
+.suggestionsContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestionsContainer::-webkit-scrollbar-thumb {
+  background: rgba(126, 87, 194, 0.3);
+  border-radius: 10px;
+}
+
+.suggestionButton {
+  background: rgba(25, 18, 40, 0.75);
+  border: none;
+  border-radius: 28px;
+  color: white;
+  padding: 0.65rem 1.1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  margin-right: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  height: 48px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.suggestionButton:hover {
+  background: rgba(75, 55, 110, 0.85);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.suggestionButton:hover .suggestionIcon {
+  transform: scale(1.1);
+}
+
+.suggestionButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(90, 65, 130, 0.9);
+}
+
+.suggestionIcon {
+  width: 32px;
+  height: 32px;
+  background: rgba(126, 87, 194, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+  color: #a370f0;
+  transition: transform 0.2s ease;
+}
+
+/* Style pour créer l'effet de quinconce plus naturel sur les 3 lignes */
+.suggestionButton:nth-child(3n+1) {
+  transform: translateX(0.5rem);
+}
+
+.suggestionButton:nth-child(3n+2) {
+  transform: translateX(1.75rem);
+}
+
+.suggestionButton:nth-child(3n+3) {
+  transform: translateX(1rem);
+}
+
+.lightMode .suggestionButton {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.lightMode .suggestionButton:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.lightMode .suggestionButton:active {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.lightMode .suggestionIcon {
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* Le fond et la couleur du texte seront définis dynamiquement dans le composant */
+}
+
+.inputContainer {
+  position: relative;
+  margin: 0 1rem;
+  margin-top: auto;
+  margin-bottom: 1.5rem;
+}
+
+.inputBar {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 24px;
+  color: white;
+  padding: 1rem 3rem 1rem 1rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+.inputBar::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sendButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sendButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lightMode .sendButton {
+  color: #333;
+}
+
+.lightMode .sendButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.chatbotContainer {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  height: 80vh;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+.chatbotContainer * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.container {
+  width: 100%;
+  max-width: 1000px;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ciblage plus précis */
+.chatbot,
+.container > div,
+.container > div > div,
+.main > div,
+.main > div > div {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-clip: content-box;
+}
+
+.chatbotContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Chat messages styles will be handled by the Chatbot component */

@@ -90,7 +90,19 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
 
   // Scroll vers le bas à chaque nouveau message
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      const messagesContainer = messagesEndRef.current.parentElement;
+      if (messagesContainer) {
+        // Force le défilement vers le bas en conservant la position quand l'utilisateur fait défiler manuellement
+        const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 100;
+        
+        if (isScrolledToBottom) {
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }, 100);
+        }
+      }
+    }
   }, [messages]);
 
   // Sélection d'une émotion
@@ -212,104 +224,211 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
     router.push(`/feed?emotion=${emotionCode}&cause=${encodeURIComponent(cause)}`);
   };
 
-  // Styles conditionnels basés sur emotionColor
-  const getBotMessageStyle = () => {
-    if (emotionColor) {
-      return {
-        backgroundColor: `${emotionColor}30`,
-        borderColor: emotionColor,
-      };
-    }
-    return {};
-  };
-
   return (
     <div className={styles.chatbot} style={{
       background: emotionColor 
-        ? `linear-gradient(135deg, ${emotionColor}30 0%, #180533 100%)` 
-        : 'linear-gradient(135deg, #300e5f 0%, #180533 100%)'
+        ? `linear-gradient(135deg, ${emotionColor}70 0%, #180533 100%)` 
+        : 'linear-gradient(135deg, rgba(48, 14, 95, 0.9) 0%, rgba(24, 5, 51, 0.9) 100%)'
     }}>
-      <div className={styles.chatHeader}>
-        <button className={styles.backButton} onClick={onBack}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
-        <div className={styles.chatTitle}>
-          myMind
-          <span className={styles.activeIndicator}></span>
+      {/* Glassmorphism Header */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '70px',
+        overflow: 'hidden',
+        zIndex: 100
+      }}>
+        {/* Effet de verre */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(48, 14, 95, 0.2)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+        }} />
+        
+        {/* Flou (se trouve dans un div distinct pour une meilleure compatibilité) */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)'
+        }} />
+        
+        {/* Contenu du header */}
+        <div style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          padding: '0 16px',
+          zIndex: 5
+        }}>
+          <button 
+            onClick={onBack}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: 'none',
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              color: 'white',
+              cursor: 'pointer',
+              transition: '0.3s all',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)'
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div style={{
+            marginLeft: '16px',
+            fontSize: '24px',
+            fontWeight: 600,
+            color: 'white',
+            letterSpacing: '0.5px',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+          }}>
+            myMind
+          </div>
         </div>
       </div>
 
-      <div className={styles.chatMessages}>
-        {/* Affichage des messages */}
+      {/* Messages */}
+      <div className={styles.chatMessages} style={{ marginTop: '70px' }}>
         {messages.map((message) => (
           <div
-            key={message.id}
-            className={`${styles.message} ${
-              message.sender === 'user' ? styles.userMessage : styles.botMessage
-            }`}
-            style={message.sender === 'bot' ? getBotMessageStyle() : {}}
+            key={`message-${message.id}`}
+            className={message.sender === 'user' ? styles.userMessageContainer : styles.botMessageContainer}
           >
-            <div className={styles.messageText}>{message.text}</div>
+            <div 
+              className={message.sender === 'user' ? styles.userMessage : styles.botMessage}
+              style={{
+                backgroundColor: message.sender === 'user' 
+                  ? 'rgba(79, 86, 196, 0.85)' 
+                  : 'rgba(255, 255, 255, 0.18)',
+                borderBottomRightRadius: message.sender === 'user' ? '4px' : '18px',
+                borderBottomLeftRadius: message.sender === 'user' ? '18px' : '4px',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+              }}
+            >
+              {message.text}
+            </div>
           </div>
         ))}
         
         {/* Indicateur de chargement */}
         {isTyping && (
-          <div className={`${styles.message} ${styles.botMessage}`}>
-            <div className={styles.typingIndicator}>
-              <span></span>
-              <span></span>
-              <span></span>
+          <div className={styles.botMessageContainer}>
+            <div 
+              className={styles.botMessage}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.18)',
+                borderBottomLeftRadius: '4px',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+              }}
+            >
+              <div className={styles.typingDots}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </div>
           </div>
         )}
         
-        {/* Bouton Commencer */}
-        {chatState === 'chat' && (
-          <div className={styles.startButtonContainer}>
-            <button 
-              className={styles.startButton}
-              onClick={handleStartJourney}
-            >
-              Commencer
-            </button>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
+        {/* Référence pour le défilement automatique */}
+        <div ref={messagesEndRef} className={styles.messagesEndRef} />
       </div>
-      
-      {/* Sélection d'émotion - maintenant affiché en dehors du chatMessages pour une position fixe en bas */}
+
+      {/* Options pour la sélection d'émotions */}
       {chatState === 'selecting_emotion' && (
-        <div className={styles.emojiContainer}>
-          {emotions.map((emotion) => (
-            <button
-              key={emotion.emotion}
-              className={styles.emojiButton}
-              onClick={() => handleEmotionSelection(emotion.emotion, emotion.text)}
-            >
-              <span>{emotion.icon}</span>
-              <span className={styles.emojiLabel}>{emotion.text}</span>
-            </button>
-          ))}
+        <div className={styles.optionsContainer}>
+          <div className={styles.optionsRow}>
+            {emotions.slice(0, 4).map((emotion) => (
+              <button
+                key={`emotion-${emotion.emotion}`}
+                className={styles.optionButton}
+                onClick={() => handleEmotionSelection(emotion.emotion, emotion.text)}
+              >
+                <span>{emotion.icon}</span>
+                {emotion.text}
+              </button>
+            ))}
+          </div>
+          <div className={styles.optionsRow}>
+            {emotions.slice(4).map((emotion) => (
+              <button
+                key={`emotion-${emotion.emotion}`}
+                className={styles.optionButton}
+                onClick={() => handleEmotionSelection(emotion.emotion, emotion.text)}
+              >
+                <span>{emotion.icon}</span>
+                {emotion.text}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       
-      {/* Sélection de cause - maintenant affiché en dehors du chatMessages pour une position fixe en bas */}
+      {/* Options pour la sélection de raisons */}
       {chatState === 'selecting_reason' && (
-        <div className={styles.emojiContainer}>
-          {emotionCauses.map((cause) => (
-            <button
-              key={cause.cause}
-              className={styles.emojiButton}
-              onClick={() => handleCauseSelection(cause.cause)}
-            >
-              <span>{cause.emoji}</span>
-              <span className={styles.emojiLabel}>{cause.label}</span>
-            </button>
-          ))}
+        <div className={styles.optionsContainer}>
+          <div className={styles.optionsRow}>
+            {emotionCauses.slice(0, 4).map((cause) => (
+              <button
+                key={`cause-${cause.cause}`}
+                className={styles.optionButton}
+                onClick={() => handleCauseSelection(cause.cause)}
+              >
+                <span>{cause.emoji}</span>
+                {cause.label}
+              </button>
+            ))}
+          </div>
+          <div className={styles.optionsRow}>
+            {emotionCauses.slice(4).map((cause) => (
+              <button
+                key={`cause-${cause.cause}`}
+                className={styles.optionButton}
+                onClick={() => handleCauseSelection(cause.cause)}
+              >
+                <span>{cause.emoji}</span>
+                {cause.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Bouton pour commencer le parcours */}
+      {chatState === 'chat' && (
+        <div className={styles.startButtonContainer}>
+          <button 
+            className={styles.startButton}
+            onClick={handleStartJourney}
+          >
+            Commencer
+          </button>
         </div>
       )}
     </div>

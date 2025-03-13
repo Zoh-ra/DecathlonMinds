@@ -2,8 +2,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 1rem;
+  padding: 0;
   background-color: #f7f9fc;
+  position: relative;
 }
 
 .main.lightMode {
@@ -16,6 +17,10 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
 }
 
 .logoContainer {
@@ -24,33 +29,22 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding: 0.5rem 0;
-}
-
-.backButton {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: all 0.2s ease;
-  color: inherit;
-}
-
-.backButton:hover {
-  opacity: 0.8;
-}
-
-.backButton svg {
-  margin-right: 0.5rem;
+  position: relative;
+  z-index: 10;
 }
 
 .emotionInfo {
   text-align: center;
   margin-bottom: 1.5rem;
-  padding: 0.75rem;
-  border-radius: 8px;
+  padding: 1rem;
+  border-radius: 18px;
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  font-size: 1.1rem;
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10;
 }
 
 .title {
@@ -71,21 +65,27 @@
 .filters {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
+  padding: 0.5rem;
+  position: relative;
+  z-index: 10;
 }
 
 .filterButton {
-  padding: 0.5rem 1rem;
-  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.25rem;
+  background-color: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  border-radius: 24px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   transition: all 0.2s ease;
   color: inherit;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .filterButton:hover {
@@ -109,10 +109,41 @@
   border-color: #0066cc;
 }
 
-.feedGrid {
+.feedGrid, 
+.postsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  position: relative;
+  overflow-y: auto;
+  padding: 0.5rem;
+  padding-bottom: 2rem;
+  max-height: calc(100vh - 200px); /* Ajuster la hauteur en fonction des éléments au-dessus */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 102, 204, 0.5) rgba(255, 255, 255, 0.05);
+}
+
+.feedGrid::-webkit-scrollbar,
+.postsGrid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.feedGrid::-webkit-scrollbar-track,
+.postsGrid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.feedGrid::-webkit-scrollbar-thumb,
+.postsGrid::-webkit-scrollbar-thumb {
+  background: rgba(0, 102, 204, 0.5);
+  border-radius: 10px;
+}
+
+.feedGrid::-webkit-scrollbar-thumb:hover,
+.postsGrid::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 102, 204, 0.7);
 }
 
 .loading {
@@ -130,6 +161,46 @@
   font-size: 1.2rem;
   color: inherit;
   opacity: 0.7;
+}
+
+.loadingContainer, .errorContainer, .emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  color: inherit;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 24px;
+  padding: 0.5rem 1rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.backButton:hover {
+  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.backButton svg {
+  margin-right: 0.5rem;
 }
 
 /* Responsive adjustments */

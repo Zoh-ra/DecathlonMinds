@@ -5,30 +5,105 @@
   justify-content: center;
   min-height: 100vh;
   padding: 1rem;
-  background: linear-gradient(135deg, #300e5f 0%, #180533 100%);
+  background: linear-gradient(135deg, #3a1a78 0%, #180533 100%);
   color: white;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.main::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(93, 52, 168, 0.3) 0%, rgba(24, 5, 51, 0) 60%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .lightMode {
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  background: linear-gradient(135deg, #f0f4ff 0%, #e6eefe 100%);
   color: #333;
 }
 
-.lightMode .menuButton, 
+.lightMode::before {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(240, 244, 255, 0) 60%);
+}
+
 .lightMode .themeButton, 
-.lightMode .suggestionButton, 
-.lightMode .modeButton, 
-.lightMode .inputBar {
-  background: rgba(0, 0, 0, 0.1);
+.lightMode .suggestionButton {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
   color: #333;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.lightMode .inputBar {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  color: #333;
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .lightMode .inputBar::placeholder {
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* Règle supprimée pour permettre au logo de s'afficher sans conteneur */
+.mainContainer {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+.lightMode {
+  background: linear-gradient(180deg, #ffffff 0%, #f2f5ff 100%);
+  color: #33374B;
+}
+
+.darkMode {
+  background: linear-gradient(180deg, #0A0D14 0%, #171A26 100%);
+  color: #EDEEFD;
+}
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0;
+  min-height: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 0 0;
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  color: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: auto;
+  min-height: 0;
+  padding-bottom: 0;
+}
 
 .container {
   width: 100%;
@@ -40,178 +115,72 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  justify-content: flex-start;
+  z-index: 1;
+  padding-bottom: 2rem;
+  overflow: hidden;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding: 1rem 0.5rem;
 }
 
-.menuButton, .themeButton {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+.themeButton {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
-.menuButton:hover, .themeButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+.themeButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
-/* Styles for the menu */
-.menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 80%;
-  max-width: 300px;
-  height: 100vh;
-  background: linear-gradient(135deg, rgba(46, 16, 101, 0.98) 0%, rgba(28, 8, 61, 0.98) 100%);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-origin: left;
+.pageContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.8s ease;
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.lightMode .menu {
-  background: linear-gradient(135deg, rgba(245, 245, 245, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-.menuHeader {
-  display: flex;
-  align-items: center;
-  padding: 1.5rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.lightMode .menuHeader {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.closeButton {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+.title {
   color: white;
-  cursor: pointer;
-  margin-right: 1rem;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.closeButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(90deg);
-}
-
-.lightMode .closeButton {
-  color: #333;
-}
-
-.menuHeader h3 {
-  font-size: 1.3rem;
+  font-size: 1.75rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
   font-weight: 600;
-  margin: 0;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
-.menuList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.menuList li {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.2s ease;
-}
-
-.menuList li button {
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 1.1rem 1.5rem;
-  width: 100%;
-  text-align: left;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  position: relative;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-
-.menuList li button::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background: #a370f0;
-  opacity: 0;
-  transform: scaleY(0.5);
-  transition: all 0.3s ease;
-}
-
-.lightMode .menuList li {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.menuList li:hover button {
-  background: rgba(255, 255, 255, 0.1);
-  padding-left: 2rem;
-}
-
-.menuList li:hover button::before {
-  opacity: 1;
-  transform: scaleY(1);
-}
-
-.lightMode .menuList li:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.lightMode .menuList li button {
+.lightMode .title {
   color: #333;
 }
 
-.lightMode .menuList li button::before {
-  background: #6d4cb3;
+.titleContainer {
+  text-align: center;
+  margin: 1rem 0 2rem 0;
 }
 
 .assistantContainer {
@@ -219,160 +188,281 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 2rem 0;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+  animation: fadeIn 0.8s ease;
+  margin-top: 1rem;
 }
 
-.assistantIcon {
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .assistantText {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin: 0.8rem 0 0.3rem;
   text-align: center;
   letter-spacing: 0.02em;
+  background: linear-gradient(90deg, #ffffff 0%, #e0e0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.lightMode .assistantText {
+  background: linear-gradient(90deg, #333333 0%, #4a3a8c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
 }
 
 .assistantSubtext {
   font-size: 1rem;
-  opacity: 0.8;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
+  opacity: 0.9;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+.welcomeMessage {
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 0 1rem 2rem 1rem;
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.welcomeIcon {
+  font-size: 2rem;
+  margin-bottom: 0.6rem;
+  display: inline-block;
+  filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+}
+
+.welcomeMessage h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.7rem;
+  background: linear-gradient(90deg, #ffffff 0%, #e0e0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.02em;
+}
+
+.lightMode .welcomeMessage h2 {
+  background: linear-gradient(90deg, #333333 0%, #4a3a8c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcomeMessage p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.95;
 }
 
 .suggestionsContainer {
-  display: grid;
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column dense;
-  grid-auto-columns: max-content;
-  gap: 0.9rem;
-  margin-bottom: 2.5rem;
-  margin-top: 2.5rem;
   width: 100%;
-  max-width: 100%;
-  padding: 0.5rem 1rem 1.5rem 1rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  scroll-snap-type: x mandatory;
-  grid-row-gap: 0.9rem;
-  grid-column-gap: 0.4rem;
+  padding: 0 0.5rem;
+  margin: 0 auto 3rem;
+  position: relative;
 }
 
-.suggestionsContainer::-webkit-scrollbar {
+.suggestionsScroller {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1rem;
+}
+
+.suggestionsScroller::-webkit-scrollbar {
+  display: none;
   width: 0;
   height: 0;
-  background: transparent;
-  display: none;
 }
 
-.suggestionsContainer::-webkit-scrollbar-track {
-  background: transparent;
+.suggestionsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
 }
 
-.suggestionsContainer::-webkit-scrollbar-thumb {
-  background: rgba(126, 87, 194, 0.3);
-  border-radius: 10px;
+.suggestionRow {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  padding: 0 0.5rem;
 }
 
 .suggestionButton {
-  background: rgba(25, 18, 40, 0.75);
-  border: none;
-  border-radius: 28px;
-  color: white;
-  padding: 0.65rem 1.1rem;
-  display: flex;
-  flex-direction: row;
+  flex: 0 0 auto;
+  min-width: 140px;
+  display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0.9rem 1.5rem;
+  border-radius: 30px;
   font-size: 0.92rem;
+  font-weight: 500;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
-  margin-right: 0.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  height: 48px;
-  flex-shrink: 0;
-  scroll-snap-align: start;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .suggestionButton:hover {
-  background: rgba(75, 55, 110, 0.85);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
-}
-
-.suggestionButton:hover .suggestionIcon {
-  transform: scale(1.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .suggestionButton:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  background: rgba(90, 65, 130, 0.9);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.suggestionIcon {
-  width: 32px;
-  height: 32px;
-  background: rgba(126, 87, 194, 0.2);
-  border-radius: 50%;
+.suggestionEmoji {
+  font-size: 1.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 0.75rem;
-  font-size: 1.2rem;
-  color: #a370f0;
-  transition: transform 0.2s ease;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
 }
 
-/* Style pour créer l'effet de quinconce plus naturel sur les 3 lignes */
-.suggestionButton:nth-child(3n+1) {
-  transform: translateX(0.5rem);
+.emotionButton {
+  background: transparent;
+  border-radius: 30px;
+  border: 2px solid transparent;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0.5rem;
+  font-size: 0.9rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
 }
 
-.suggestionButton:nth-child(3n+2) {
-  transform: translateX(1.75rem);
+.emotionButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: 0;
 }
 
-.suggestionButton:nth-child(3n+3) {
-  transform: translateX(1rem);
+.lightMode .emotionButton {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.lightMode .suggestionButton {
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.lightMode .emotionButton::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 100%);
 }
 
-.lightMode .suggestionButton:hover {
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  transform: translateY(-3px);
+.emotionButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
-.lightMode .suggestionButton:active {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+.lightMode .emotionButton:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
-.lightMode .suggestionIcon {
-  opacity: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* Le fond et la couleur du texte seront définis dynamiquement dans le composant */
+.emotionButton:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.emotionIcon {
+  font-size: 1.25rem;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+.emotionText {
+  font-weight: 500;
+}
+
+.emotionsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.emotionsContainer::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.conversationContainer {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 1;
+  padding-bottom: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.chatFormContainer {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 0.8rem 1rem 1.2rem;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-top: auto;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .inputContainer {
@@ -453,6 +543,53 @@
   box-shadow: none !important;
 }
 
+.main {
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 0 0;
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  color: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: auto;
+  min-height: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .suggestionsContainer {
+    gap: 0.75rem;
+  }
+  
+  .suggestionButton {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.1rem;
+  }
+  
+  .assistantText {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .assistantText {
+    font-size: 1.5rem;
+  }
+  
+  .assistantSubtext {
+    font-size: 1rem;
+  }
+  
+  .quickAction {
+    min-width: 70px;
+    padding: 1rem 0.5rem;
+  }
+}
+
 /* Ciblage plus précis */
 .chatbot,
 .container > div,
@@ -475,4 +612,10 @@
   box-shadow: none !important;
 }
 
-/* Chat messages styles will be handled by the Chatbot component */
+.featuresContainer {
+  display: none;
+}
+
+.featureCard {
+  display: none;
+}

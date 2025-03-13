@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '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',
+  apiKey: process.env.OPENAI_API_KEY || 'sk-proj-BkwSrFMB0PH2lLvlHBwANqsUiT2BFLFPskWFCb90eBLYJTtHvmLmxQeIJjPOPAhV7U69VnbPtmCrEOGu58BdPwVVxljhqMxZ19Z3n0Qe4gjx',
 });
 
 export async function POST(req: NextRequest) {

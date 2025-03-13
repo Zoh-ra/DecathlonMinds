@@ -10,12 +10,14 @@ interface OpenAIFeedRequest {
 
 // Service pour gérer les interactions avec OpenAI
 class OpenAIService {
-  private apiKey: string = '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';
-  private endpoint: string = 'https://api.openai.com/v1/chat/completions';
-  private organization: string = ''; // Laissez vide si vous n'avez pas d'ID d'organisation spécifique
+  // Utilisation de l'API OpenAI
+  private apiKey: string = process.env.OPENAI_API_KEY || 'sk-proj-BkwSrFMB0PH2lLvlHBwANqsUiT2BFLFPskWFCb90eBLYJTtHvmLmxQeIJjPOPAhV7U69VnbPtmCrEOGu58BdPwVVxljhqMxZ19Z3n0Qe4gjx'
+  private endpoint: string = 'https://api.openai.com/v1/chat/completions'
+  private organization: string = ''
 
   constructor() {
-    // La clé API est maintenant définie directement en tant que propriété
+    // La clé API est maintenant définie via process.env ou une valeur par défaut comme fallback
+    console.log('OpenAI Service initialisé');
   }
 
   // Fonction pour générer des posts via l'API OpenAI

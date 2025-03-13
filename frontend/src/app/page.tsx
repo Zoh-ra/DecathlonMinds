@@ -11,8 +11,8 @@ export default function LaunchPage() {
         <Image
           src="/images/logo/Logo.png"
           alt="DecatMind Logo"
-          width={1000}
-          height={500}
+          width={1200}
+          height={600}
           className={styles.logo}
           priority
         />
@@ -21,8 +21,7 @@ export default function LaunchPage() {
       <div className={styles.taglineContainer}>
         <p className={styles.tagline}>
           Être utile aux gens par le mouvement,<br />
-          parce-que nous sommes concernés<br />
-          par la santé mentale.
+          parce-que nous sommes concernés par la santé mentale.
         </p>
       </div>
       
@@ -32,13 +31,6 @@ export default function LaunchPage() {
           className={styles.launchButton}
         >
           Lancez vous !
-        </Link>
-        
-        <Link 
-          href="/today" 
-          className={styles.continueButton}
-        >
-          Continuer
         </Link>
       </div>
     </div>

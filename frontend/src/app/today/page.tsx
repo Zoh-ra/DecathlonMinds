@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import Chatbot from '../../components/Chatbot/Chatbot';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function TodayPage() {
@@ -11,8 +12,8 @@ export default function TodayPage() {
   const [darkMode, setDarkMode] = useState(true);
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [inputValue, setInputValue] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   // Couleurs pour le mode sombre (existantes)
   const darkModeColors = [
@@ -78,19 +79,15 @@ export default function TodayPage() {
     }
   }, [showChat]);
 
-  const handleStartChat = () => {
-    setShowChat(true);
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setSelectedSuggestion(suggestion);
-    setShowChat(true);
-  };
-
   const handleEmotionClick = (emotion: string, color: string) => {
     setSelectedSuggestion(`Je me sens ${emotion}`);
     setSelectedEmotion(color);
     setSelectedColor(color);
+    
+    // Stocker l'émotion et sa couleur dans localStorage
+    localStorage.setItem('selectedEmotion', emotion);
+    localStorage.setItem('selectedEmotionColor', color);
+    
     setShowChat(true);
   };
 
@@ -100,13 +97,6 @@ export default function TodayPage() {
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
-  };
-
-  const handleSendInputMessage = () => {
-    if (inputValue.trim()) {
-      setSelectedSuggestion(inputValue);
-      setShowChat(true);
-    }
   };
 
   return (
@@ -193,6 +183,24 @@ export default function TodayPage() {
                     </li>
                     <li>
                       <button
+                        onClick={() => {
+                          toggleMenu();
+                          router.push('/feed');
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                          <path d="M12 3v18"></path>
+                          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                          <path d="M3 9h18"></path>
+                          <path d="M3 15h18"></path>
+                          <path d="M9 9v13"></path>
+                          <path d="M15 9v13"></path>
+                        </svg>
+                        Journal
+                      </button>
+                    </li>
+                    <li>
+                      <button
                         onClick={toggleMenu}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
@@ -227,6 +235,7 @@ export default function TodayPage() {
                 </ul>
               </div>
             )}
+            
             <div className={styles.assistantContainer}>
               <div className={styles.assistantIcon}>
                 <Image 
@@ -269,29 +278,29 @@ export default function TodayPage() {
                 </button>
               ))}
             </div>
-            </>
-          ) : (
-            <div 
-              className={styles.chatbotContainer} 
-              style={{ 
-                border: 'none',
-                outline: 'none',
-                boxShadow: 'none',
-                overflow: 'hidden',
-                background: 'transparent',
-                padding: 0,
-                margin: 0
-              }}
-            >
-              <Chatbot
-                initialMessage={selectedSuggestion}
-                onBack={() => setShowChat(false)}
-                emotionColor={selectedEmotion}
-              />
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
+          </>
+        ) : (
+          <div 
+            className={styles.chatbotContainer} 
+            style={{ 
+              border: 'none',
+              outline: 'none',
+              boxShadow: 'none',
+              overflow: 'hidden',
+              background: 'transparent',
+              padding: 0,
+              margin: 0
+            }}
+          >
+            <Chatbot
+              initialMessage={selectedSuggestion}
+              onBack={() => setShowChat(false)}
+              emotionColor={selectedEmotion}
+            />
+          </div>
+        )}
+      </div>
+    </main>
+  </div>
   );
 }

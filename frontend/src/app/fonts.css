@@ -1,0 +1,56 @@
+/* Configuration des polices ITC Avant Garde Std */
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-Bk.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-BkObl.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-BoldObl.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-Demi.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-Md.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ITC Avant Garde Std';
+  src: url('/fonts/ITCAvantGardeStd-XLt.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}

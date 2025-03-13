@@ -55,14 +55,16 @@
   max-width: 300px;
   margin-bottom: 10vh;
   display: flex;
+  flex-direction: column;
+  gap: 12px;
   justify-content: center;
 }
 
 .launchButton {
   width: 100%;
   padding: 16px 32px;
-  background-color: white;
-  color: #3643BA;
+  background-color: #F5603D;
+  color: white;
   border: none;
   border-radius: 50px;
   font-family: var(--font-nunito), 'Nunito', sans-serif;
@@ -72,16 +74,48 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   letter-spacing: 0.02em;
+  text-align: center;
+  text-decoration: none;
+  display: block;
 }
 
 .launchButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #e44e2e;
 }
 
 .launchButton:active {
   transform: translateY(0);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.continueButton {
+  width: 100%;
+  padding: 16px 32px;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: white;
+  border: 2px solid #F5603D;
+  border-radius: 50px;
+  font-family: var(--font-nunito), 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+
+.continueButton:hover {
+  transform: translateY(-2px);
+  background-color: rgba(245, 96, 61, 0.1);
+}
+
+.continueButton:active {
+  transform: translateY(0);
 }
 
 @media (max-height: 600px) {
@@ -99,7 +133,7 @@
     font-size: 1.1rem;
   }
   
-  .launchButton {
+  .launchButton, .continueButton {
     font-size: 1.1rem;
   }
 }

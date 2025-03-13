@@ -1,16 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import styles from './launch.module.css';
 
 export default function LaunchPage() {
-  const router = useRouter();
-
-  const handleLaunch = () => {
-    router.push('/today');
-  };
-
   return (
     <div className={styles.launchContainer}>
       <div className={styles.logoContainer}>
@@ -33,12 +27,19 @@ export default function LaunchPage() {
       </div>
       
       <div className={styles.buttonContainer}>
-        <button 
+        <Link 
+          href="/today" 
           className={styles.launchButton}
-          onClick={handleLaunch}
         >
           Lancez vous !
-        </button>
+        </Link>
+        
+        <Link 
+          href="/today" 
+          className={styles.continueButton}
+        >
+          Continuer
+        </Link>
       </div>
     </div>
   );

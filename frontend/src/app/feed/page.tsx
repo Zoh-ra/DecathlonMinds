@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
 import FeedPostCard from '@/components/Feed/FeedPostCard';
-import { Post, PostType } from '@/types/feed';
+import { Post } from '@/types/feed';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
@@ -11,8 +11,8 @@ export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<PostType | 'ALL'>('ALL');
   const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState('aujourd\'hui');
   
   // Récupérer l'émotion et la cause des paramètres d'URL
   const emotion = searchParams.get('emotion') || undefined;
@@ -106,20 +106,15 @@ export default function FeedPage() {
     }
   }, [emotion, cause]);
   
-  // Filtrer les posts par type
-  const handleFilterChange = (filter: PostType | 'ALL') => {
-    setActiveFilter(filter);
-  };
-  
   // Charger les posts au chargement initial ou quand les paramètres changent
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts, emotion, cause]);
 
-  // Filtrer les posts affichés en fonction du type sélectionné
-  const filteredPosts = activeFilter === 'ALL'
-    ? posts
-    : posts.filter(post => post.type === activeFilter);
+  // Fonction pour changer d'onglet activé
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
 
   // Rendu du composant
   return (
@@ -141,40 +136,6 @@ export default function FeedPage() {
           </div>
         )}
         
-        {/* Filtres pour les types de posts */}
-        <div className={styles.filters}>
-          <button 
-            className={`${styles.filterButton} ${activeFilter === 'ALL' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('ALL')}
-          >
-            Tous
-          </button>
-          <button 
-            className={`${styles.filterButton} ${activeFilter === 'SCIENTIFIC' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('SCIENTIFIC')}
-          >
-            Articles
-          </button>
-          <button 
-            className={`${styles.filterButton} ${activeFilter === 'QUOTE' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('QUOTE')}
-          >
-            Citations
-          </button>
-          <button 
-            className={`${styles.filterButton} ${activeFilter === 'ROUTE' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('ROUTE')}
-          >
-            Parcours
-          </button>
-          <button 
-            className={`${styles.filterButton} ${activeFilter === 'EVENT' ? styles.active : ''}`}
-            onClick={() => handleFilterChange('EVENT')}
-          >
-            Événements
-          </button>
-        </div>
-        
         {/* Affichage des posts */}
         {isLoading ? (
           <div className={styles.loadingContainer}>
@@ -188,25 +149,76 @@ export default function FeedPage() {
               Réessayer
             </button>
           </div>
-        ) : filteredPosts.length === 0 ? (
+        ) : posts.length === 0 ? (
           <div className={styles.emptyContainer}>
-            <p>Aucun post ne correspond à vos critères actuels.</p>
-            <button 
-              onClick={() => {
-                setActiveFilter('ALL');
-              }}
-              className={styles.resetButton}
-            >
-              Réinitialiser les filtres
-            </button>
+            <p>Aucun post disponible pour le moment.</p>
           </div>
         ) : (
           <div className={styles.postsGrid}>
-            {filteredPosts.map((post) => (
+            {posts.map((post) => (
               <FeedPostCard key={post.id} post={post} />
             ))}
           </div>
         )}
+      </div>
+      
+      {/* Barre de navigation en bas */}
+      <div className={styles.bottomNavbar}>
+        <div className={styles.navButton}>
+          <div 
+            onClick={() => handleTabChange('aujourd\'hui')}
+            className={`${styles.navLink} ${activeTab === 'aujourd\'hui' ? styles.active : ''}`}
+          >
+            <div className={styles.navIcon}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span>Aujourd&apos;hui</span>
+          </div>
+        </div>
+        <div className={styles.navButton}>
+          <div 
+            onClick={() => handleTabChange('explorer')}
+            className={`${styles.navLink} ${activeTab === 'explorer' ? styles.active : ''}`}
+          >
+            <div className={styles.navIcon}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span>Explorer</span>
+          </div>
+        </div>
+        <div className={styles.navButton}>
+          <div 
+            onClick={() => handleTabChange('suivi')}
+            className={`${styles.navLink} ${activeTab === 'suivi' ? styles.active : ''}`}
+          >
+            <div className={styles.navIcon}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3v18h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18 9l-5 5-4-4-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span>Suivi</span>
+          </div>
+        </div>
+        <div className={styles.navButton}>
+          <div 
+            onClick={() => handleTabChange('profil')}
+            className={`${styles.navLink} ${activeTab === 'profil' ? styles.active : ''}`}
+          >
+            <div className={styles.navIcon}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6 21V19C6 17.9391 6.42143 16.9217 7.17157 16.1716C7.92172 15.4214 8.93913 15 10 15H14C15.0609 15 16.0783 15.4214 16.8284 16.1716C17.5786 16.9217 18 17.9391 18 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span>Profil</span>
+          </div>
+        </div>
       </div>
     </main>
   );

@@ -108,9 +108,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emot
   };
 
   // Fonction pour gérer la sélection d'une cause
-  const handleCauseSelection = (cause: string) => {
+  const handleCauseSelection = (cause: string, label: string) => {
     // Rediriger vers la page de motivation avec les paramètres d'émotion et de cause
-    router.push(`/motivation?emotion=${encodeURIComponent(selectedEmotion)}&cause=${encodeURIComponent(cause)}`);
+    router.push(`/motivation?emotion=${encodeURIComponent(selectedEmotion)}&cause=${encodeURIComponent(cause)}&label=${encodeURIComponent(label)}`);
   };
 
   // Fonction pour obtenir une citation rassurante
@@ -278,42 +278,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emot
           </div>
         ))}
         
-        {/* Affichage des émojis d'émotion */}
-        {chatState === 'selecting_emotion' && (
-          <div className={styles.emojiCauseContainer} style={getEmojiContainerStyle()}>
-            {emotions.map((item, index) => (
-              <div key={index} className={styles.emojiWrapper}>
-                <button 
-                  className={styles.emojiCauseButton}
-                  onClick={() => handleEmotionSelection(item.emotion, item.text)}
-                >
-                  {item.icon}
-                </button>
-                <div className={styles.emojiLabel}>{item.text}</div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Affichage des émojis de cause */}
-        {chatState === 'selecting_reason' && (
-          <div className={styles.emojiCauseContainer}>
-            <div className={styles.causesGrid}>
-              {emotionCauses.map((cause) => (
-                <div 
-                  key={cause.cause} 
-                  className={styles.reasonOption} 
-                  onClick={() => handleCauseSelection(cause.cause)}
-                  style={getEmojiBgStyle()}
-                >
-                  <div className={styles.reasonEmoji}>{cause.emoji}</div>
-                  <div className={styles.reasonLabel}>{cause.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        
         {/* Indicateur de chargement */}
         {isTyping && (
           <div className={styles.messageContainer}>
@@ -329,6 +293,77 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, onClose, emot
         
         <div ref={messagesEndRef} />
       </div>
+      
+      {/* Affichage des options d'émotions et causes tout en bas */}
+      {(chatState === 'selecting_emotion' || chatState === 'selecting_reason') && (
+        <div style={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          width: '100%',
+          padding: '25px 0 15px',
+          zIndex: 10
+        }}>
+          {chatState === 'selecting_emotion' && (
+            <div className="twoRowsGrid" style={{ width: '100%' }}>
+              <div className="twoRowsRow">
+                {emotions.slice(0, Math.ceil(emotions.length / 2)).map((emotion, index) => (
+                  <button
+                    key={index}
+                    className="pillCard"
+                    onClick={() => handleEmotionSelection(emotion.emotion, emotion.text)}
+                  >
+                    <span style={{ marginRight: '8px' }}>{emotion.icon}</span>
+                    {emotion.text}
+                  </button>
+                ))}
+              </div>
+              <div className="twoRowsRow">
+                {emotions.slice(Math.ceil(emotions.length / 2)).map((emotion, index) => (
+                  <button
+                    key={index + Math.ceil(emotions.length / 2)}
+                    className="pillCard"
+                    onClick={() => handleEmotionSelection(emotion.emotion, emotion.text)}
+                  >
+                    <span style={{ marginRight: '8px' }}>{emotion.icon}</span>
+                    {emotion.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {chatState === 'selecting_reason' && (
+            <div className="twoRowsGrid" style={{ width: '100%' }}>
+              <div className="twoRowsRow">
+                {emotionCauses.slice(0, Math.ceil(emotionCauses.length / 2)).map((cause, index) => (
+                  <button
+                    key={index}
+                    className="pillCard"
+                    onClick={() => handleCauseSelection(cause.cause, cause.label)}
+                  >
+                    <span style={{ marginRight: '8px' }}>{cause.emoji}</span>
+                    {cause.label}
+                  </button>
+                ))}
+              </div>
+              <div className="twoRowsRow">
+                {emotionCauses.slice(Math.ceil(emotionCauses.length / 2)).map((cause, index) => (
+                  <button
+                    key={index + Math.ceil(emotionCauses.length / 2)}
+                    className="pillCard"
+                    onClick={() => handleCauseSelection(cause.cause, cause.label)}
+                  >
+                    <span style={{ marginRight: '8px' }}>{cause.emoji}</span>
+                    {cause.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

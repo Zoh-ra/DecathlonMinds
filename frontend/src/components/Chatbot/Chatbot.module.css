@@ -76,7 +76,7 @@
   gap: 16px;
   padding: 1rem;
   padding-top: 60px; /* Espace pour le bouton de retour */
-  padding-bottom: 110px; /* Espace pour éviter que le contenu soit caché par les émojis/causes */
+  padding-bottom: 140px; /* Espace suffisant pour les deux rangées de boutons */
 }
 
 .messageContainer {
@@ -438,6 +438,8 @@
 .moodTagIcon {
   font-size: 1.2rem;
 }
+
+/* Supprimer optionsContainer qui n'est plus utilisé */
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

@@ -48,6 +48,10 @@ export default function MotivationPage() {
   const handleBackClick = () => {
     router.push('/today');
   };
+
+  const handleFeedClick = () => {
+    router.push('/today/feed');
+  };
   
   // Correspondance exacte avec les couleurs définies dans TodayPage
   const getEmotionColor = () => {
@@ -86,13 +90,14 @@ export default function MotivationPage() {
     return luminance > 0.6; // Seuil pour déterminer si la couleur est claire
   };
 
+  // UseEffect pour définir la couleur du texte en fonction de l'émotion
+  useEffect(() => {
+    const emotionColor = getEmotionColor();
+    setTextColor(isLightColor(emotionColor) ? '#191970' : '#FFFFFF');
+  }, [emotion]); // Dépendance sur emotion pour que la couleur change si l'émotion change
+
   const getBackgroundStyle = () => {
     const emotionColor = getEmotionColor();
-    
-    // Définir la couleur du texte en fonction de la luminosité du fond
-    setTimeout(() => {
-      setTextColor(isLightColor(emotionColor) ? '#191970' : '#FFFFFF');
-    }, 0);
     
     return {
       background: `linear-gradient(to bottom right, ${emotionColor}, #180533)`,
@@ -116,10 +121,12 @@ export default function MotivationPage() {
     };
   };
 
+  const isDarkText = textColor !== '#FFFFFF';
+
   return (
     <div className={styles.container} style={getBackgroundStyle()}>
       <div className={styles.header}>
-        <button onClick={handleBackClick} className={styles.backButton} aria-label="Retour">
+        <button onClick={handleBackClick} className="pillButton" aria-label="Retour">
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             width="24" 
@@ -134,16 +141,44 @@ export default function MotivationPage() {
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
+          Retour
         </button>
       </div>
       
-      <div className={styles.quoteContainer} style={getContainerStyle()}>
+      <div className={`${styles.quoteContainer} ${isDarkText ? styles.darkText : ''}`} style={getContainerStyle()}>
         {loading ? (
           <div className={styles.loader}>
             <div className={styles.spinner}></div>
           </div>
         ) : (
-          <p className={styles.quote} style={getTextStyle()}>{quote}</p>
+          <>
+            <p className={styles.quote} style={getTextStyle()}>{quote}</p>
+            <button 
+              className="pillButton"
+              onClick={handleFeedClick}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ marginRight: '8px' }}
+              >
+                <path d="M12 3v18"></path>
+                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                <path d="M3 9h18"></path>
+                <path d="M3 15h18"></path>
+                <path d="M9 9v13"></path>
+                <path d="M15 9v13"></path>
+              </svg>
+              Voir mon journal
+            </button>
+          </>
         )}
       </div>
     </div>

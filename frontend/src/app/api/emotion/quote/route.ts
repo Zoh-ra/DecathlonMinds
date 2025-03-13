@@ -14,24 +14,39 @@ export async function POST(req: NextRequest) {
     
     // Try to get a quote from the backend first
     try {
-      const backendResponse = await fetch('http://localhost:8080/api/emotion/quote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          emotion: body.emotion,
-          reason: body.reason,
-        }),
-        cache: 'no-store',
-      });
+      // Check first if the backend is available to avoid connection timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
       
-      if (backendResponse.ok) {
-        const data = await backendResponse.json();
-        return NextResponse.json(data);
+      const backendCheck = await fetch('http://localhost:8080/api/health', {
+        signal: controller.signal
+      }).catch(() => null);
+      
+      clearTimeout(timeoutId);
+      
+      // Only proceed if backend is available
+      if (backendCheck && backendCheck.ok) {
+        const backendResponse = await fetch('http://localhost:8080/api/emotion/quote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            emotion: body.emotion,
+            reason: body.reason,
+          }),
+          cache: 'no-store',
+        });
+        
+        if (backendResponse.ok) {
+          const data = await backendResponse.json();
+          return NextResponse.json(data);
+        }
+      } else {
+        console.log('Backend server not available, using fallback quotes');
       }
     } catch (error) {
-      console.log('Failed to get quote from backend, using fallback');
+      console.log('Failed to get quote from backend, using fallback', error);
     }
     
     // Fallback quotes based on emotion

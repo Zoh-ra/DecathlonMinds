@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import Chatbot from '../../components/Chatbot/Chatbot';
+import { useRouter } from 'next/navigation';
 
 export default function TodayPage() {
   const [showChat, setShowChat] = useState(false);
@@ -11,6 +12,7 @@ export default function TodayPage() {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [inputValue, setInputValue] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   const emotions = [
     { text: "Heureux(se)", icon: "😊", emotion: "HAPPY", color: "#FFD700" }, // Jaune doré
@@ -69,6 +71,12 @@ export default function TodayPage() {
   const handleEmotionClick = (emotion: string, color: string) => {
     setSelectedSuggestion(`Je me sens ${emotion}`);
     setSelectedEmotion(color);
+    
+    // Stocker l'émotion et sa couleur dans localStorage
+    localStorage.setItem('selectedEmotion', emotion);
+    localStorage.setItem('selectedEmotionColor', color);
+    
+    // Afficher le chatbot au lieu de rediriger vers les articles
     setShowChat(true);
   };
 
@@ -163,6 +171,24 @@ export default function TodayPage() {
                   </li>
                   <li>
                     <button
+                      onClick={() => {
+                        toggleMenu();
+                        router.push('/today/feed');
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                        <path d="M12 3v18"></path>
+                        <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                        <path d="M3 9h18"></path>
+                        <path d="M3 15h18"></path>
+                        <path d="M9 9v13"></path>
+                        <path d="M15 9v13"></path>
+                      </svg>
+                      Journal
+                    </button>
+                  </li>
+                  <li>
+                    <button
                       onClick={toggleMenu}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
@@ -190,48 +216,57 @@ export default function TodayPage() {
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    Paramètres
-                  </button>
-                </li>
-              </ul>
+                      </svg>
+                      Paramètres
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+            
+            <div className={styles.assistantContainer}>
+              <div className={styles.assistantIcon}>
+                <img 
+                  src="/images/logo/DecathlonMindsLogo.png" 
+                  alt="Décathlon Minds Logo" 
+                  width="120" 
+                  height="120" 
+                  style={{ objectFit: 'contain' }} 
+                />
+              </div>
+              <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>Décathlon</span>Minds</h1>
+              <p className={styles.assistantSubtext}>Comment puis-je vous aider aujourd'hui ?</p>
             </div>
-          )}
-          <div className={styles.assistantContainer}>
-            <div className={styles.assistantIcon}>
-              <img 
-                src="/images/logo/DecathlonMindsLogo.png" 
-                alt="Décathlon Minds Logo" 
-                width="120" 
-                height="120" 
-                style={{ objectFit: 'contain' }} 
-              />
-            </div>
-            <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>Décathlon</span>Minds</h1>
-            <p className={styles.assistantSubtext}>Comment puis-je vous aider aujourd'hui ?</p>
-          </div>
 
-          <div className={styles.suggestionsContainer}>
-            {emotions.map((emotion, index) => (
-              <button
-                key={index}
-                className={styles.suggestionButton}
-                onClick={() => handleEmotionClick(emotion.text, emotion.color)}
-                style={{ 
-                  background: `linear-gradient(135deg, rgba(25, 18, 40, 0.75), ${emotion.color}40)`,
-                  borderColor: `${emotion.color}60` 
-                }}
-              >
-                <div className={styles.suggestionIcon} style={{ 
-                  background: `${emotion.color}30`,
-                  color: emotion.color 
-                }}>
-                  {emotion.icon}
-                </div>
-                {emotion.text}
-              </button>
-            ))}
-          </div>
+            <h2 className={styles.title}>Comment vous sentez-vous aujourd&apos;hui ?</h2>
+            
+            <div className="twoRowsGrid">
+              <div className="twoRowsRow">
+                {emotions.slice(0, Math.ceil(emotions.length / 2)).map((emotionObj, index) => (
+                  <button
+                    key={index}
+                    className="pillCard"
+                    onClick={() => handleEmotionClick(emotionObj.text, emotionObj.color)}
+                  >
+                    <span style={{ marginRight: '8px' }}>{emotionObj.icon}</span>
+                    {emotionObj.text}
+                  </button>
+                ))}
+              </div>
+              <div className="twoRowsRow">
+                {emotions.slice(Math.ceil(emotions.length / 2)).map((emotionObj, index) => (
+                  <button
+                    key={index + Math.ceil(emotions.length / 2)}
+                    className="pillCard"
+                    onClick={() => handleEmotionClick(emotionObj.text, emotionObj.color)}
+                  >
+                    <span style={{ marginRight: '8px' }}>{emotionObj.icon}</span>
+                    {emotionObj.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
           </>
         ) : (
           <div 

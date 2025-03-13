@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     
     // Call OpenAI API
     const chatCompletion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
@@ -44,28 +44,43 @@ export async function POST(req: NextRequest) {
           content: message,
         },
       ],
-      max_tokens: 300,
+      max_tokens: 500, // Increased from 300 for more comprehensive responses
     });
     
     // Extract response
     const response = chatCompletion.choices[0]?.message?.content || 
       "Je suis désolé, je n'ai pas pu traiter votre demande. Comment puis-je vous aider autrement ?";
     
-    // Store conversation in the backend
+    // Store conversation in the backend (if available)
     try {
-      await fetch('http://localhost:8080/api/conversation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userMessage: message,
-          botResponse: response,
-          emotion: emotion || '',
-          reason: reason || '',
-          timestamp: new Date().toISOString(),
-        }),
-      });
+      // Check first if the backend is available to avoid connection timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
+      
+      const backendCheck = await fetch('http://localhost:8080/api/health', {
+        signal: controller.signal
+      }).catch(() => null);
+      
+      clearTimeout(timeoutId);
+      
+      // Only proceed if backend is available
+      if (backendCheck && backendCheck.ok) {
+        await fetch('http://localhost:8080/api/conversation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userMessage: message,
+            botResponse: response,
+            emotion: emotion || '',
+            reason: reason || '',
+            timestamp: new Date().toISOString(),
+          }),
+        });
+      } else {
+        console.log('Backend server not available, skipping conversation storage');
+      }
     } catch (error) {
       console.error('Failed to store conversation in backend:', error);
       // Continue even if backend storage fails

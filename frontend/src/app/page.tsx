@@ -1,77 +1,42 @@
-// Splash page for the root route
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import styles from './launch.module.css';
 
-export default function Home() {
+export default function LaunchPage() {
   return (
-    <div 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        padding: '20px',
-        background: 'linear-gradient(180deg, #3643BA 8%, #3643BA 36%, #3643BA 66.5%, #989FDC 97.5%)',
-        fontFamily: 'Arial, sans-serif',
-        color: 'white',
-        textAlign: 'center'
-      }}
-    >
-      <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-        <img 
-          src="/images/logo/DecathlonMindsLogo.png" 
-          alt="Décathlon Minds Logo" 
-          width="250" 
-          height="100" 
-          style={{ objectFit: 'contain' }} 
+    <div className={styles.launchContainer}>
+      <div className={styles.logoContainer}>
+        <Image
+          src="/images/logo/Logo.png"
+          alt="DecatMind Logo"
+          width={1000}
+          height={500}
+          className={styles.logo}
+          priority
         />
       </div>
       
-      <p style={{ 
-        marginBottom: '60px', 
-        textAlign: 'center', 
-        maxWidth: '300px',
-        fontSize: '18px',
-        lineHeight: '1.5'
-      }}>
-        Être utile aux gens par le mouvement, parce-que nous sommes concernés par la santé mentale.
-      </p>
+      <div className={styles.taglineContainer}>
+        <p className={styles.tagline}>
+          Être utile aux gens par le mouvement,<br />
+          parce-que nous sommes concernés<br />
+          par la santé mentale.
+        </p>
+      </div>
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '320px' }}>
+      <div className={styles.buttonContainer}>
         <Link 
           href="/today" 
-          style={{
-            backgroundColor: '#F5603D',
-            color: 'white',
-            padding: '15px 30px',
-            borderRadius: '40px',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-            fontSize: '18px',
-            display: 'block',
-            textAlign: 'center',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-          }}
+          className={styles.launchButton}
         >
           Lancez vous !
         </Link>
         
         <Link 
           href="/today" 
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(5px)',
-            color: 'white',
-            padding: '15px 30px',
-            borderRadius: '40px',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-            fontSize: '18px',
-            display: 'block',
-            textAlign: 'center',
-            border: '2px solid #F5603D'
-          }}
+          className={styles.continueButton}
         >
           Continuer
         </Link>

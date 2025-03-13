@@ -1,0 +1,105 @@
+.launchContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  width: 100%;
+  background-color: #3643BA;
+  color: white;
+  padding: 2rem;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10vh;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.logo {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  max-width: 100%;
+}
+
+.taglineContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  padding: 0 1rem;
+  margin: 0 auto;
+  margin-top: -20vh;
+}
+
+.tagline {
+  color: white;
+  font-family: var(--font-avantgarde), 'ITC Avant Garde Gothic Std', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.buttonContainer {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 10vh;
+  display: flex;
+  justify-content: center;
+}
+
+.launchButton {
+  width: 100%;
+  padding: 16px 32px;
+  background-color: white;
+  color: #3643BA;
+  border: none;
+  border-radius: 50px;
+  font-family: var(--font-nunito), 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.launchButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.launchButton:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-height: 600px) {
+  .logoContainer {
+    margin-top: 5vh;
+  }
+  
+  .buttonContainer {
+    margin-bottom: 5vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .tagline {
+    font-size: 1.1rem;
+  }
+  
+  .launchButton {
+    font-size: 1.1rem;
+  }
+}

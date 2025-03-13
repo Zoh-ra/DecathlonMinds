@@ -55,3 +55,21 @@ export interface EventPost extends BasePost {
 
 // Type union pour tous les types de posts
 export type Post = ScientificPost | QuotePost | RoutePost | EventPost;
+
+// Types d'humeurs/émotions supportées
+export type Mood =
+  | "HAPPY"
+  | "CONTENT"
+  | "MELANCHOLIC"
+  | "FRUSTRATED"
+  | "JOYFUL"
+  | "CONFIDENT"
+  | "DISAPPOINTED"
+  | "ANXIOUS"
+  | "EXCITED"
+  | "SAD"
+  | "ANGRY"
+  | "STRESSED"
+  | "INJURED"
+  | "CONFUSED"
+  | "NERVOUS";

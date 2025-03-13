@@ -28,6 +28,10 @@ export default function TodayPage() {
     { text: "En colère", icon: "😡", emotion: "ANGRY", color: "#E0FFFF" }, // Cyan clair (contraire)
     { text: "Frustré(e)", icon: "😤", emotion: "FRUSTRATED", color: "#F0FFF0" }, // Vert menthe (contraire)
     { text: "Anxieux(se)", icon: "😰", emotion: "ANXIOUS", color: "#FFF8DC" }, // Blanc-crème (contraire)
+    { text: "Stressé(e)", icon: "😓", emotion: "STRESSED", color: "#E6E6FA" }, // Lavande (apaisant)
+    { text: "Blessé(e)", icon: "🤕", emotion: "INJURED", color: "#F0F8FF" }, // Bleu très pâle (apaisant)
+    { text: "Déboussolé(e)", icon: "🤯", emotion: "CONFUSED", color: "#F5F5DC" }, // Beige (neutre, apaisant)
+    { text: "Nerveux(se)", icon: "😬", emotion: "NERVOUS", color: "#FFFACD" }, // Jaune léger (apaisant)
   ];
 
   // Couleurs plus vives pour le mode jour
@@ -43,6 +47,10 @@ export default function TodayPage() {
     { text: "En colère", icon: "😡", emotion: "ANGRY", color: "#18FFFF" }, // Cyan électrique
     { text: "Frustré(e)", icon: "😤", emotion: "FRUSTRATED", color: "#1DE9B6" }, // Turquoise vif
     { text: "Anxieux(se)", icon: "😰", emotion: "ANXIOUS", color: "#FFECB3" }, // Ambre clair
+    { text: "Stressé(e)", icon: "😓", emotion: "STRESSED", color: "#B39DDB" }, // Violet moyen (apaisant)
+    { text: "Blessé(e)", icon: "🤕", emotion: "INJURED", color: "#90CAF9" }, // Bleu clair (apaisant)
+    { text: "Déboussolé(e)", icon: "🤯", emotion: "CONFUSED", color: "#DCEDC8" }, // Vert très pâle (apaisant)
+    { text: "Nerveux(se)", icon: "😬", emotion: "NERVOUS", color: "#FFF59D" }, // Jaune pâle (apaisant)
   ];
 
   // Choisir la palette de couleurs en fonction du mode
@@ -135,7 +143,12 @@ export default function TodayPage() {
                     </svg>
                   ) : (
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 3a6.364 6.364 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                      <path d="M12 3v18"></path>
+                      <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                      <path d="M3 9h18"></path>
+                      <path d="M3 15h18"></path>
+                      <path d="M9 9v13"></path>
+                      <path d="M15 9v13"></path>
                     </svg>
                   )}
                 </button>
@@ -241,13 +254,13 @@ export default function TodayPage() {
                 <Image 
                   src="/images/logo/Logo.png" 
                   alt="Décathlon Minds Logo" 
-                  width={120} 
-                  height={120} 
+                  width={300} 
+                  height={100} 
                   style={{ objectFit: 'contain' }} 
                 />
               </div>
-              <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>Décathlon</span>Minds</h1>
-              <p className={styles.assistantSubtext}>Comment puis-je vous aider aujourd&apos;hui ?</p>
+              <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>My</span>Mind</h1>
+              <p className={styles.assistantSubtext}>Comment vous sentez-vous aujourd&apos;hui ?</p>
             </div>
 
             <div className={styles.suggestionsContainer}>

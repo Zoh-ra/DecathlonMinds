@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './Chatbot.module.css';
 import { useRouter } from 'next/navigation';
+import { addToUserJourney } from '../../utils/userJourney';
 
 interface Message {
   id: string;
@@ -35,6 +36,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
     { text: "Fatigué(e)", icon: "😴", emotion: "TIRED" },
     { text: "Calme", icon: "😌", emotion: "CALM" },
     { text: "Excité(e)", icon: "🤩", emotion: "EXCITED" },
+    { text: "Stressé(e)", icon: "😓", emotion: "STRESSED" },
+    { text: "Blessé(e)", icon: "🤕", emotion: "INJURED" }, 
+    { text: "Déboussolé(e)", icon: "🤯", emotion: "CONFUSED" },
+    { text: "Nerveux(se)", icon: "😬", emotion: "NERVOUS" },
   ];
   
   // Causes possibles
@@ -184,7 +189,16 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
     setIsTyping(true);
     setMessages(prev => [...prev, userMessage]);
     
-    // 5. Afficher la réponse après un délai
+    // 5. Trouver la valeur de l'émotion (HAPPY, SAD, etc.)
+    const emotionObject = emotions.find(e => e.text === selectedEmotion);
+    const emotionCode = emotionObject ? emotionObject.emotion : '';
+    
+    // 6. Enregistrer l'émotion et la raison dans le parcours utilisateur
+    if (emotionCode) {
+      addToUserJourney(emotionCode, cause);
+    }
+    
+    // 7. Afficher la réponse après un délai
     setTimeout(() => {
       setIsTyping(false);
       setMessages(prev => [...prev, botMessage]);
@@ -207,6 +221,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
     // Trouver la valeur de l'émotion (HAPPY, SAD, etc.)
     const emotionObject = emotions.find(e => e.text === selectedEmotion);
     const emotionCode = emotionObject ? emotionObject.emotion : '';
+    
+    // Enregistrer à nouveau pour être sûr avant la redirection
+    if (emotionCode && cause) {
+      addToUserJourney(emotionCode, cause);
+    }
     
     // Rediriger vers la page feed avec les paramètres d'émotion et de cause
     router.push(`/feed?emotion=${emotionCode}&cause=${encodeURIComponent(cause)}`);

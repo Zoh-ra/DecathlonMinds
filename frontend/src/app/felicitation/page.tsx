@@ -12,7 +12,7 @@ export default function FelicitationPage() {
   // Redirection automatique après un délai
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/today');
+      router.push('/profilobjectif');
     }, 8000); // Redirection après 8 secondes
     
     return () => clearTimeout(timer);
@@ -52,7 +52,7 @@ export default function FelicitationPage() {
           de toutes les fonctionnalités pour améliorer votre bien-être émotionnel.
         </p>
         
-        <Link href="/today" className={styles.continueButton}>
+        <Link href="/profilobjectif" className={styles.continueButton}>
           Continuer
         </Link>
         

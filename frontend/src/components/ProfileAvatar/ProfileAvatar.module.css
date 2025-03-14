@@ -1,0 +1,33 @@
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #3E64FF, #5A7BFF);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(62, 100, 255, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.small {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.medium {
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+}
+
+.large {
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+}

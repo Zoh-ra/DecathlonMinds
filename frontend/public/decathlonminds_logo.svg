@@ -1,0 +1,27 @@
+<svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Decathlon Logo -->
+  <path d="M16.5 30C16.5 23.0964 22.0964 17.5 29 17.5H38.5C45.4036 17.5 51 23.0964 51 30C51 36.9036 45.4036 42.5 38.5 42.5H29C22.0964 42.5 16.5 36.9036 16.5 30Z" stroke="white" stroke-width="3"/>
+  <path d="M22 30C22 26.134 25.134 23 29 23H38.5C42.366 23 45.5 26.134 45.5 30C45.5 33.866 42.366 37 38.5 37H29C25.134 37 22 33.866 22 30Z" fill="white"/>
+  
+  <!-- Text: DECATHLON -->
+  <path d="M57 23H62.5V37H57V23Z" fill="white"/>
+  <path d="M64.5 23H70.5L74 30.5L77.5 23H83.5V37H79V28.5L75 37H73L69 28.5V37H64.5V23Z" fill="white"/>
+  <path d="M86 30C86 25.5 89.5 22.5 94 22.5C98.5 22.5 102 25.5 102 30C102 34.5 98.5 37.5 94 37.5C89.5 37.5 86 34.5 86 30ZM97 30C97 28 95.8 27 94 27C92.2 27 91 28 91 30C91 32 92.2 33 94 33C95.8 33 97 32 97 30Z" fill="white"/>
+  <path d="M103.5 23H109V25H109.2C110 23.5 111.5 22.5 113.5 22.5C117 22.5 119 25 119 28.5V37H114V29.5C114 28 113.3 27 111.8 27C110.3 27 109 28 109 30V37H103.5V23Z" fill="white"/>
+  <path d="M120.5 23H125.5V37H120.5V23Z" fill="white"/>
+  <path d="M127.5 23H133V25H133.2C134 23.5 135.5 22.5 137.5 22.5C141 22.5 143 25 143 28.5V37H138V29.5C138 28 137.3 27 135.8 27C134.3 27 133 28 133 30V37H127.5V23Z" fill="white"/>
+  <path d="M145 23H150.5V37H145V23Z" fill="white"/>
+  <path d="M152 30C152 25.5 155.5 22.5 160 22.5C164.5 22.5 168 25.5 168 30C168 34.5 164.5 37.5 160 37.5C155.5 37.5 152 34.5 152 30ZM163 30C163 28 161.8 27 160 27C158.2 27 157 28 157 30C157 32 158.2 33 160 33C161.8 33 163 32 163 30Z" fill="white"/>
+  <path d="M169.5 23H175V25H175.2C176 23.5 177.5 22.5 179.5 22.5C183 22.5 185 25 185 28.5V37H180V29.5C180 28 179.3 27 177.8 27C176.3 27 175 28 175 30V37H169.5V23Z" fill="white"/>
+  
+  <!-- Mind color gradient text -->
+  <text x="160" y="28" font-family="Arial" font-weight="bold" font-size="18" fill="url(#mindGradient)">Mind</text>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="mindGradient" x1="140" y1="20" x2="200" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF6B4A"/>
+      <stop offset="100%" stop-color="#FF9F80"/>
+    </linearGradient>
+  </defs>
+</svg>

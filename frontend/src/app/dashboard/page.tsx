@@ -6,6 +6,8 @@ import { BarChart, Bar, Cell, XAxis, ResponsiveContainer } from 'recharts';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import Navbar from '@/components/Navigation/Navbar';
+import Image from 'next/image';
+import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 
 // Données pour le graphique d'activité hebdomadaire
 const weekData = [
@@ -40,9 +42,16 @@ const MapWithNoSSR = dynamic(() => import('./DashboardMap'), {
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(3); // Index du jour sélectionné (26 mars)
   const [isMounted, setIsMounted] = useState(false);
+  const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
     setIsMounted(true);
+    
+    // Récupérer le nom d'utilisateur du localStorage
+    const storedUserName = localStorage.getItem('userName');
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
   }, []);
 
   // Jours de la semaine pour la sélection de dates
@@ -60,7 +69,22 @@ export default function Dashboard() {
         {/* En-tête avec nom et objectif */}
         <header className={styles.header}>
           <div className={styles.userInfoSection}>
-            <h1 className={styles.userName}>Manon</h1>
+            <Image 
+              src="/decathlonminds_logo.svg" 
+              alt="DecathlonMind Logo" 
+              width={180} 
+              height={40}
+              className={styles.logo}
+              priority
+            />
+            <div className={styles.userInfo}>
+              {userName && (
+                <>
+                  <span className={styles.userName}>{userName}</span>
+                  <ProfileAvatar userName={userName} />
+                </>
+              )}
+            </div>
             <h2 className={styles.subtitle}>Objectif hebdomadaire: 10 000 pas par jour</h2>
           </div>
           <div>

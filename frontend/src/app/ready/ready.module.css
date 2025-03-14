@@ -1,0 +1,120 @@
+.container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #3E55CC 0%, #4B60DD 50%, #5D6FEE 100%);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.logoContainer {
+  margin-bottom: 30px;
+}
+
+.title {
+  color: white;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  color: white;
+  text-align: left;
+}
+
+.featureItem p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.checkIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: white;
+  background-color: #FF6B4A;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 50%;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.startButton {
+  background-color: #FF6B4A;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 74, 0.3);
+  width: 100%;
+  max-width: 300px;
+}
+
+.startButton:hover {
+  background-color: #FF845C;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 107, 74, 0.4);
+}
+
+/* Courbes d'arrière-plan */
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/wave-pattern.svg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .title {
+    font-size: 28px;
+  }
+  
+  .featureItem p {
+    font-size: 15px;
+  }
+}

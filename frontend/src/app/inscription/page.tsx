@@ -98,6 +98,9 @@ export default function InscriptionPage() {
       // Simule une requête API
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Stocker le nom d'utilisateur dans le localStorage
+      localStorage.setItem('userName', formData.name);
+      
       // Rediriger vers la page de félicitation
       router.push('/felicitation');
     } catch (error) {

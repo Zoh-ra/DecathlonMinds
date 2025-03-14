@@ -30,6 +30,31 @@
   backdrop-filter: blur(8px);
 }
 
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  height: auto;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1E293B;
+}
+
 .userProfile {
   display: flex;
   align-items: center;

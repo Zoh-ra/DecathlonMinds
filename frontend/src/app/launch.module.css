@@ -5,7 +5,7 @@
   justify-content: space-between;
   height: 100vh;
   width: 100%;
-  background-color: #3643BA;
+  background: linear-gradient(to bottom, #3643BA, #ffffff);
   color: white;
   padding: 2rem;
   box-sizing: border-box;
@@ -17,7 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10vh;
+  margin-top: 30vh;
   width: 100%;
   max-width: 1200px;
 }
@@ -36,7 +36,7 @@
   max-width: 320px;
   padding: 0 1rem;
   margin: 0 auto;
-  margin-top: -20vh;
+  margin-top: -10vh;
 }
 
 .tagline {
@@ -93,10 +93,9 @@
 .continueButton {
   width: 100%;
   padding: 16px 32px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color:  #e44e2e;
   backdrop-filter: blur(5px);
   color: white;
-  border: 2px solid #F5603D;
   border-radius: 50px;
   font-family: var(--font-nunito), 'Nunito', sans-serif;
   font-size: 1rem;

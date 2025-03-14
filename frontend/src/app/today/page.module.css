@@ -5,7 +5,7 @@
   justify-content: center;
   min-height: 100vh;
   padding: 1rem;
-  background: linear-gradient(135deg, #300e5f 0%, #180533 100%);
+  background: linear-gradient(135deg, #3643BA 30%, #6b7afd 100%);
   color: white;
   transition: all 0.3s ease;
 }
@@ -75,7 +75,7 @@
   width: 80%;
   max-width: 300px;
   height: 100vh;
-  background: linear-gradient(135deg, rgba(46, 16, 101, 0.98) 0%, rgba(28, 8, 61, 0.98) 100%);
+  background: linear-gradient(135deg, #3643BA 30%, #6b7afd 100%);
   backdrop-filter: blur(10px);
   z-index: 1000;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
@@ -182,7 +182,7 @@
   top: 0;
   height: 100%;
   width: 3px;
-  background: #a370f0;
+  background: #3643BA;
   opacity: 0;
   transform: scaleY(0.5);
   transition: all 0.3s ease;
@@ -211,7 +211,7 @@
 }
 
 .lightMode .menuList li button::before {
-  background: #6d4cb3;
+  background: #3643BA;
 }
 
 .assistantContainer {
@@ -324,20 +324,6 @@
   background: rgba(90, 65, 130, 0.9);
 }
 
-.suggestionIcon {
-  width: 32px;
-  height: 32px;
-  background: rgba(126, 87, 194, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 0.75rem;
-  font-size: 1.2rem;
-  color: #a370f0;
-  transition: transform 0.2s ease;
-}
-
 /* Style pour créer l'effet de quinconce plus naturel sur les 3 lignes */
 .suggestionButton:nth-child(3n+1) {
   transform: translateX(0.5rem);
@@ -369,10 +355,18 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.lightMode .suggestionIcon {
-  opacity: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* Le fond et la couleur du texte seront définis dynamiquement dans le composant */
+.suggestionIcon {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+  color: #fff;
+  transition: transform 0.2s ease;
 }
 
 .inputContainer {

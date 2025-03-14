@@ -150,7 +150,7 @@ export default function TodayPage() {
                 </svg>
               </div>
               <h1 className={styles.assistantText}>Bonjour, je suis <span style={{ fontWeight: 'bold' }}>Décathlon</span>Minds</h1>
-              <p className={styles.assistantSubtext}>Comment puis-je vous aider aujourd'hui ?</p>
+              <p className={styles.assistantSubtext}>Comment vous sentez-vous aujourd'hui ?</p>
             </div>
 
             <div className={styles.suggestionsContainer}>

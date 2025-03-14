@@ -1,9 +1,93 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './FeedPostCard.module.css';
 import { Post, ScientificPost, QuotePost, RoutePost, EventPost } from '@/types/feed';
+
+// Liste d'images de secours garanties fonctionnelles
+const FALLBACK_IMAGES = {
+  SCIENTIFIC: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+  ROUTE: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+  EVENT: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+};
+
+// Composant pour afficher une image avec fallback automatique en cas d'erreur
+const SafeImage = ({ 
+  src, 
+  alt, 
+  className, 
+  postType 
+}: { 
+  src: string, 
+  alt: string, 
+  className: string, 
+  postType: string 
+}) => {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  
+  // Vérifier si l'image est valide lors du montage du composant
+  useEffect(() => {
+    // Fonction pour vérifier si une image existe
+    const checkImage = (url: string) => {
+      return new Promise<boolean>((resolve) => {
+        const img = new (typeof window !== 'undefined' ? window.Image : Object) as HTMLImageElement;
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+    };
+    
+    // Vérifier l'image actuelle
+    const verifyImage = async () => {
+      setLoading(true);
+      try {
+        const valid = await checkImage(src);
+        if (!valid && postType in FALLBACK_IMAGES) {
+          console.log(`[ImageFallback] Image invalide détectée, remplacement: ${src}`);
+          setImgSrc(FALLBACK_IMAGES[postType as keyof typeof FALLBACK_IMAGES]);
+          setError(true);
+        }
+      } catch (e) {
+        console.error('Erreur lors de la vérification de l\'image:', e);
+        if (postType in FALLBACK_IMAGES) {
+          setImgSrc(FALLBACK_IMAGES[postType as keyof typeof FALLBACK_IMAGES]);
+          setError(true);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    verifyImage();
+  }, [src, postType]);
+  
+  // Gérer les erreurs lors du chargement de l'image
+  const handleImageError = () => {
+    if (postType in FALLBACK_IMAGES && !error) {
+      console.log(`[ImageFallback] Erreur de chargement, remplacement: ${imgSrc}`);
+      setImgSrc(FALLBACK_IMAGES[postType as keyof typeof FALLBACK_IMAGES]);
+      setError(true);
+    }
+  };
+  
+  return (
+    <div className={styles.imageContainer}>
+      {loading && <div className={styles.imagePlaceholder} />}
+      <Image 
+        src={imgSrc}
+        alt={alt}
+        className={className}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        onError={handleImageError}
+        onLoad={() => setLoading(false)}
+      />
+    </div>
+  );
+};
 
 interface FeedPostCardProps {
   post: Post;
@@ -57,15 +141,12 @@ const FeedPostCard = ({ post }: FeedPostCardProps) => {
       return (
         <div className={`${styles.card}`}>
           {scientificPost.imageUrl && (
-            <div className={styles.imageContainer}>
-              <Image 
-                src={scientificPost.imageUrl}
-                alt={scientificPost.title || 'Scientific article image'}
-                className={styles.cardImage}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
+            <SafeImage 
+              src={scientificPost.imageUrl}
+              alt={scientificPost.title || 'Scientific article image'}
+              className={styles.cardImage}
+              postType="SCIENTIFIC"
+            />
           )}
           <div className={styles.cardContent}>
             {scientificPost.author && (
@@ -179,15 +260,12 @@ const FeedPostCard = ({ post }: FeedPostCardProps) => {
       return (
         <div className={`${styles.card}`}>
           {routePost.imageUrl && (
-            <div className={styles.imageContainer}>
-              <Image 
-                src={routePost.imageUrl}
-                alt={routePost.title || 'Route image'}
-                className={styles.cardImage}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
+            <SafeImage 
+              src={routePost.imageUrl}
+              alt={routePost.title || 'Route image'}
+              className={styles.cardImage}
+              postType="ROUTE"
+            />
           )}
           <div className={styles.cardContent}>
             <h2 className={styles.cardTitle}>{routePost.title}</h2>
@@ -258,15 +336,12 @@ const FeedPostCard = ({ post }: FeedPostCardProps) => {
       return (
         <div className={`${styles.card}`}>
           {eventPost.imageUrl && (
-            <div className={styles.imageContainer}>
-              <Image 
-                src={eventPost.imageUrl}
-                alt={eventPost.title || 'Event image'}
-                className={styles.cardImage}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
+            <SafeImage 
+              src={eventPost.imageUrl}
+              alt={eventPost.title || 'Event image'}
+              className={styles.cardImage}
+              postType="EVENT"
+            />
           )}
           <div className={styles.cardContent}>
             <h2 className={styles.cardTitle}>{eventPost.title}</h2>

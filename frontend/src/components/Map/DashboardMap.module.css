@@ -1,0 +1,8 @@
+.map {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  filter: grayscale(0.8);
+  border-radius: 16px;
+}

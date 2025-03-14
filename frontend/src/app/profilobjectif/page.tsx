@@ -289,7 +289,7 @@ export default function ProfileObjectivePage() {
     <div className={styles.pageContainer}>
       <div className={styles.header}>
         <Image 
-          src="/decathlonminds_logo.svg" 
+          src="/images/logo/LogoBleu.png" 
           alt="DecathlonMind Logo" 
           width={180} 
           height={40}

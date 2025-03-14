@@ -9,6 +9,7 @@ import { getLatestUserJourneyEntry } from '@/utils/userJourney';
 import Image from 'next/image';
 import Navbar from '@/components/Navigation/Navbar';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
+import ChatbotPopup from '@/components/Chatbot/ChatbotPopup';
 
 export default function FeedPage() {
   const searchParams = useSearchParams();
@@ -105,7 +106,7 @@ export default function FeedPage() {
     <main className={styles.main}>
       <div className={styles.header}>
         <Image
-          src="/decathlonminds_logo.svg"
+          src="/images/logo/LogoBleu.png"
           alt="DecathlonMind Logo"
           width={180}
           height={40}
@@ -148,6 +149,9 @@ export default function FeedPage() {
           </div>
         )}
       </div>
+
+      {/* Composant ChatbotPopup - version popup du chatbot */}
+      <ChatbotPopup emotionColor="#0082C3" />
 
       {/* Utilisation du composant Navbar partagé */}
       <Navbar />

@@ -17,7 +17,7 @@ export default function ReadyPage() {
       <div className={styles.content}>
         <div className={styles.logoContainer}>
           <Image 
-            src="/decathlonminds_logo.svg" 
+            src="/images/logo/Logo.png" 
             alt="DecathlonMind Logo" 
             width={220} 
             height={60}

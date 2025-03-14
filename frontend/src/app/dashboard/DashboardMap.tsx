@@ -49,13 +49,13 @@ function DashboardMapContent() {
         color="#F5603D" 
         weight={4}
       />
-      {markerPoints.map((marker, idx) => (
-        <Marker
-          key={idx}
-          position={marker.position}
+      {markerPoints.map((point, index) => (
+        <Marker 
+          key={index}
+          position={point.position}
           icon={customIcon}
         >
-          <Popup>{marker.name}</Popup>
+          <Popup>{point.name}</Popup>
         </Marker>
       ))}
     </MapContainer>

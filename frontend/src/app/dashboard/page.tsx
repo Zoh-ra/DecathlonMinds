@@ -6,8 +6,6 @@ import { BarChart, Bar, Cell, XAxis, ResponsiveContainer } from 'recharts';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import Navbar from '@/components/Navigation/Navbar';
-import Image from 'next/image';
-import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 
 // Données pour le graphique d'activité hebdomadaire
 const weekData = [
@@ -63,28 +61,24 @@ export default function Dashboard() {
     { day: '27', month: 'mar' },
   ];
 
+  // Fonction pour déterminer la couleur de la barre en fonction de la valeur
+  const getBarColor = (value: number) => {
+    const maxValue = 8000;
+    const percentage = (value / maxValue) * 100;
+    
+    if (percentage < 30) return '#FF6B4A'; // Orange pour les valeurs basses
+    if (percentage < 50) return '#FF8A65'; // Orange-rouge pour les valeurs moyennes-basses
+    if (percentage < 70) return '#5C83DB'; // Bleu moyen pour les valeurs moyennes-hautes
+    return '#3E55CC'; // Bleu foncé pour les valeurs hautes
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.dashboardContainer}>
         {/* En-tête avec nom et objectif */}
         <header className={styles.header}>
           <div className={styles.userInfoSection}>
-            <Image 
-              src="/decathlonminds_logo.svg" 
-              alt="DecathlonMind Logo" 
-              width={180} 
-              height={40}
-              className={styles.logo}
-              priority
-            />
-            <div className={styles.userInfo}>
-              {userName && (
-                <>
-                  <span className={styles.userName}>{userName}</span>
-                  <ProfileAvatar userName={userName} />
-                </>
-              )}
-            </div>
+            <h1 className={styles.userNameLarge}>{userName}</h1>
             <h2 className={styles.subtitle}>Objectif hebdomadaire: 10 000 pas par jour</h2>
           </div>
           <div>
@@ -106,126 +100,130 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Section d'aperçu de l'activité */}
-        <section className={styles.activityOverviewSection}>
-          <h2 className={styles.sectionTitle}>Aperçu de votre activité</h2>
+        {/* Contenu principal du dashboard */}
+        <div className={styles.mapCard}>
+          <h3 className={styles.cardTitle}>Carte de mes parcours</h3>
+          <div className={styles.mapContainer}>
+            {isMounted && <MapWithNoSSR />}
+          </div>
+        </div>
+
+        {/* Aperçu d'activité */}
+        <div className={styles.activityCard}>
+          <h3 className={styles.cardTitle}>Activité récente</h3>
           <div className={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weekData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <Bar dataKey="value" radius={[5, 5, 0, 0]}>
-                  {weekData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={index === 10 || index === 6 ? '#F5603D' : '#1f2a6a'} 
-                      opacity={index === 10 || index === 6 ? 1 : 0.8}
-                    />
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={weekData.slice(-7)} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
+                <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  {weekData.slice(-7).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={getBarColor(entry.value)} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </section>
-
-        {/* Section des cartes d'activité */}
-        <section className={styles.activityCardsSection}>
-          {/* Carte de marche */}
-          <div className={styles.activityCard}>
-            <div className={styles.activityHeader}>
-              <span className={styles.activityTitle}>Marche</span>
-              <span className={styles.activityIcon}>🚶‍♂️</span>
+          <div className={styles.activityStats}>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>8.5</span>
+              <span className={styles.statLabel}>km</span>
             </div>
-            <div className={styles.circleProgressContainer}>
-              <div className={styles.circleProgress}>
-                <div className={styles.progressValue}>8104</div>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>72</span>
+              <span className={styles.statLabel}>min</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>9.2k</span>
+              <span className={styles.statLabel}>pas</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Statistiques de sommeil */}
+        <div className={styles.sleepCard}>
+          <h3 className={styles.cardTitle}>Qualité du sommeil</h3>
+          <div className={styles.sleepBarContainer}>
+            <div className={styles.sleepBarLabel}>
+              <span>Mauvais</span>
+              <span>Excellent</span>
+            </div>
+            <div className={styles.sleepBars}>
+              {sleepData.map((item, index) => (
+                <div key={index} className={styles.sleepBarWrapper}>
+                  <div 
+                    className={styles.sleepBar} 
+                    style={{ height: `${item.value}%` }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className={styles.sleepDays}>
+              <span>L</span>
+              <span>M</span>
+              <span>M</span>
+              <span>J</span>
+              <span>V</span>
+            </div>
+          </div>
+          <div className={styles.sleepStats}>
+            <div className={styles.sleepStatRow}>
+              <span className={styles.sleepStatLabel}>Moyenne</span>
+              <span className={styles.sleepStatValue}>7.5h</span>
+            </div>
+            <div className={styles.sleepStatRow}>
+              <span className={styles.sleepStatLabel}>Meilleur nuit</span>
+              <span className={styles.sleepStatValue}>8.2h</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Derniers parcours */}
+        <div className={styles.recommendedRoutesCard}>
+          <h3 className={styles.cardTitle}>Derniers parcours</h3>
+          <div className={styles.routesList}>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 16.19V19C22 19.5304 21.7893 20.0391 21.4142 20.4142C21.0391 20.7893 20.5304 21 20 21H4C3.46957 21 2.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H20C20.5304 3 21.0391 3.21071 21.4142 3.58579C21.7893 3.96086 22 4.46957 22 5V7.81" stroke="#4F6AF4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 7L12 14L17 10.5" stroke="#4F6AF4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className={styles.routeInfo}>
+                <h4 className={styles.routeName}>Parc des Buttes Chaumont</h4>
+                <p className={styles.routeDetails}>5.2km • 45min • Modéré</p>
+              </div>
+            </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.5 19H9C6.79086 19 5 17.2091 5 15V7" stroke="#4F6AF4" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="5" cy="5" r="2" stroke="#4F6AF4" strokeWidth="2"/>
+                  <circle cx="19" cy="5" r="2" stroke="#4F6AF4" strokeWidth="2"/>
+                  <circle cx="19" cy="19" r="2" stroke="#4F6AF4" strokeWidth="2"/>
+                </svg>
+              </div>
+              <div className={styles.routeInfo}>
+                <h4 className={styles.routeName}>Bois de Vincennes</h4>
+                <p className={styles.routeDetails}>8.7km •
+1h15min • Difficile</p>
+              </div>
+            </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#4F6AF4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 6V12L16 14" stroke="#4F6AF4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className={styles.routeInfo}>
+                <h4 className={styles.routeName}>Canal Saint-Martin</h4>
+                <p className={styles.routeDetails}>3.8km • 30min • Facile</p>
               </div>
             </div>
           </div>
-
-          {/* Carte de sommeil */}
-          <div className={styles.activityCard}>
-            <div className={styles.activityHeader}>
-              <span className={styles.activityTitle}>Sommeil</span>
-              <span className={styles.activityIcon}>🌙</span>
-            </div>
-            <div className={styles.sleepChartContainer}>
-              {sleepData.map((entry, index) => (
-                <div 
-                  key={index} 
-                  className={styles.sleepBar}
-                  style={{ height: `${entry.value}%` }}
-                />
-              ))}
-            </div>
-            <div className={styles.sleepValues}>
-              <span>6h30</span>
-            </div>
-          </div>
-
-          {/* Carte pour la carte du parcours */}
-          <div className={styles.activityCard} style={{ gridColumn: '1 / 3' }}>
-            <div className={styles.activityHeader}>
-              <span className={styles.activityTitle}>Votre parcours préféré</span>
-              <span className={styles.activityIcon}>🗺️</span>
-            </div>
-            <div className={styles.mapContainer}>
-              {isMounted && <MapWithNoSSR />}
-            </div>
-          </div>
-        </section>
-
-        {/* Section de résumé des statistiques */}
-        <section className={styles.statsSummarySection}>
-          <h2 className={styles.statsSectionTitle}>Vos statistiques</h2>
-          
-          {/* Carte d'eau */}
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>💧</div>
-            <div className={styles.statInfo}>
-              <div className={styles.statValue}>3/5</div>
-              <div className={styles.statLabel}>Consommation d&apos;eau</div>
-            </div>
-          </div>
-
-          {/* Carte de fréquence cardiaque */}
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>❤️</div>
-            <div className={styles.statInfo}>
-              <div className={styles.statValue}>95 bpm</div>
-              <div className={styles.statLabel}>Fréquence cardiaque</div>
-            </div>
-          </div>
-
-          {/* Carte de calories */}
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>🔥</div>
-            <div className={styles.statInfo}>
-              <div className={styles.statValue}>1845</div>
-              <div className={styles.statLabel}>Calories brûlées</div>
-            </div>
-          </div>
-
-          {/* Carte de distance */}
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>📏</div>
-            <div className={styles.statInfo}>
-              <div className={styles.statValue}>5.2 km</div>
-              <div className={styles.statLabel}>Distance parcourue</div>
-            </div>
-          </div>
-
-          {/* Carte de durée */}
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>⏱️</div>
-            <div className={styles.statInfo}>
-              <div className={styles.statValue}>45 min</div>
-              <div className={styles.statLabel}>Temps d&apos;activité</div>
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
 
-      {/* Utilisation du composant Navbar partagé */}
       <Navbar />
     </div>
   );

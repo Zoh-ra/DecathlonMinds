@@ -235,19 +235,21 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
   const getBotMessageStyle = () => {
     if (emotionColor) {
       return {
-        backgroundColor: `${emotionColor}30`,
-        borderColor: emotionColor,
+        backgroundColor: '#FFFFFF',
+        color: '#333',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.15)',
+        borderLeft: `3px solid ${emotionColor}`
       };
     }
-    return {};
+    return {
+      backgroundColor: '#FFFFFF',
+      color: '#333',
+      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.15)'
+    };
   };
 
   return (
-    <div className={styles.chatbot} style={{
-      background: emotionColor 
-        ? `linear-gradient(135deg, ${emotionColor}30 0%, #180533 100%)` 
-        : 'linear-gradient(135deg, #300e5f 0%, #180533 100%)'
-    }}>
+    <div className={styles.chatbot}>
       <div className={styles.chatHeader}>
         <button className={styles.backButton} onClick={onBack}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -319,16 +321,85 @@ const Chatbot: React.FC<ChatbotProps> = ({ initialMessage, onBack, emotionColor 
       {/* Sélection de cause - maintenant affiché en dehors du chatMessages pour une position fixe en bas */}
       {chatState === 'selecting_reason' && (
         <div className={styles.emojiContainer}>
-          {emotionCauses.map((cause) => (
+          {/* Première colonne */}
+          <div className={styles.columnContainer}>
             <button
-              key={cause.cause}
-              className={styles.emojiButton}
-              onClick={() => handleCauseSelection(cause.cause)}
+              className={styles.causeButton}
+              data-cause="sport"
+              onClick={() => handleCauseSelection('sport')}
             >
-              <span>{cause.emoji}</span>
-              <span className={styles.emojiLabel}>{cause.label}</span>
+              <span className={styles.causeEmoji}>🏃‍♂️</span>
+              <span className={styles.causeLabel}>Sport</span>
             </button>
-          ))}
+            <button
+              className={styles.causeButton}
+              data-cause="travail"
+              onClick={() => handleCauseSelection('travail')}
+            >
+              <span className={styles.causeEmoji}>💼</span>
+              <span className={styles.causeLabel}>Travail</span>
+            </button>
+          </div>
+          
+          {/* Deuxième colonne */}
+          <div className={styles.columnContainer}>
+            <button
+              className={styles.causeButton}
+              data-cause="famille"
+              onClick={() => handleCauseSelection('famille')}
+            >
+              <span className={styles.causeEmoji}>👨‍👩‍👧‍👦</span>
+              <span className={styles.causeLabel}>Famille</span>
+            </button>
+            <button
+              className={styles.causeButton}
+              data-cause="maison"
+              onClick={() => handleCauseSelection('maison')}
+            >
+              <span className={styles.causeEmoji}>🏠</span>
+              <span className={styles.causeLabel}>Maison</span>
+            </button>
+          </div>
+          
+          {/* Troisième colonne */}
+          <div className={styles.columnContainer}>
+            <button
+              className={styles.causeButton}
+              data-cause="relation"
+              onClick={() => handleCauseSelection('relation')}
+            >
+              <span className={styles.causeEmoji}>❤️</span>
+              <span className={styles.causeLabel}>Relation</span>
+            </button>
+            <button
+              className={styles.causeButton}
+              data-cause="mental"
+              onClick={() => handleCauseSelection('mental')}
+            >
+              <span className={styles.causeEmoji}>🧠</span>
+              <span className={styles.causeLabel}>Mental</span>
+            </button>
+          </div>
+          
+          {/* Quatrième colonne */}
+          <div className={styles.columnContainer}>
+            <button
+              className={styles.causeButton}
+              data-cause="finances"
+              onClick={() => handleCauseSelection('finances')}
+            >
+              <span className={styles.causeEmoji}>💰</span>
+              <span className={styles.causeLabel}>Finances</span>
+            </button>
+            <button
+              className={styles.causeButton}
+              data-cause="autre"
+              onClick={() => handleCauseSelection('autre')}
+            >
+              <span className={styles.causeEmoji}>🤔</span>
+              <span className={styles.causeLabel}>Autre</span>
+            </button>
+          </div>
         </div>
       )}
     </div>

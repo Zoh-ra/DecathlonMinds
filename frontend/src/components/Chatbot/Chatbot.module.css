@@ -5,7 +5,7 @@
   justify-content: space-between;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(135deg, rgba(48, 14, 95, 0.9) 0%, rgba(24, 5, 51, 0.9) 100%);
+  background: linear-gradient(135deg, #3643BA 30%, #6b7afd 100%);
   color: white;
   border: none !important;
   outline: none !important;
@@ -13,8 +13,8 @@
 
 @media (prefers-color-scheme: light) {
   .chatbot {
-    background: linear-gradient(135deg, rgba(241, 230, 255, 0.95) 0%, rgba(225, 215, 240, 0.95) 100%);
-    color: #333;
+    background: linear-gradient(135deg, #3643BA 30%, #6b7afd 100%);
+    color: white;
   }
 }
 
@@ -86,7 +86,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-bottom: 100px;
+  padding-bottom: 200px;
   padding-top: 70px;
 }
 
@@ -134,42 +134,33 @@
 }
 
 .userMessage {
-  background-color: rgba(79, 86, 196, 0.9);
+  background-color: #F5603D;
   color: white;
   align-self: flex-end;
   border-bottom-right-radius: 4px;
   margin-left: auto;
   font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .botMessage {
-  background-color: rgba(255, 255, 255, 0.18);
-  color: white;
+  background-color: #FFFFFF;
+  color: #333;
   align-self: flex-start;
   border-bottom-left-radius: 4px;
   margin-right: auto;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 @media (prefers-color-scheme: light) {
   .userMessage {
-    background-color: rgba(79, 86, 196, 0.9);
+    background-color: #F5603D;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
   
   .botMessage {
-    background-color: rgba(245, 245, 250, 0.8);
-    color: #333;
-    border: 1px solid rgba(200, 200, 220, 0.3);
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-}
-
-.userMessage:hover,
-.botMessage:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .messageText {
@@ -218,8 +209,7 @@
   left: 0;
   right: 0;
   padding: 1rem;
-  background-color: rgba(20, 10, 50, 0.9);
-  backdrop-filter: blur(5px);
+  background-color: transparent;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -269,81 +259,125 @@
   transform: none;
 }
 
-/* Emoji sélection pour les émotions et les causes */
 .emojiContainer {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 12px;
+  padding: 15px;
   position: fixed;
-  bottom: 0;
+  bottom: 30px;
   left: 0;
   right: 0;
-  background: rgba(24, 5, 51, 0.6);
-  backdrop-filter: blur(15px);
-  padding: 15px;
   z-index: 100;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  max-width: 90%;
+  margin: 0 auto;
+  background: transparent;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
 }
 
-@media (prefers-color-scheme: light) {
-  .emojiContainer {
-    background: rgba(245, 245, 250, 0.7);
-    border-top: 1px solid rgba(200, 200, 220, 0.3);
-  }
+.emojiContainer::-webkit-scrollbar {
+  display: none;
 }
 
-.emojiButton {
+.columnContainer {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  min-width: 130px;
+  flex: 0 0 auto;
+}
+
+.causeButton {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  padding: 10px;
-  min-width: 70px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
-}
-
-@media (prefers-color-scheme: light) {
-  .emojiButton {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(200, 200, 220, 0.3);
-  }
-  
-  .emojiLabel {
-    color: #333;
-  }
-}
-
-.emojiButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-@media (prefers-color-scheme: light) {
-  .emojiButton:hover {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-}
-
-.emojiButton span:first-child {
-  font-size: 24px;
-}
-
-.emojiLabel {
-  font-size: 12px;
-  text-align: center;
+  border-radius: 25px;
+  padding: 12px 18px;
   color: white;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  min-width: 130px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
 }
 
-/* Style pour le bouton commencer */
+.causeButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.causeButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.causeButton:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.causeButton[data-cause="sport"] {
+  background: linear-gradient(135deg, #FF5F6D 0%, #FFC371 100%);
+}
+
+.causeButton[data-cause="famille"] {
+  background: linear-gradient(135deg, #36D1DC 0%, #5B86E5 100%);
+}
+
+.causeButton[data-cause="travail"] {
+  background: linear-gradient(135deg, #834d9b 0%, #d04ed6 100%);
+}
+
+.causeButton[data-cause="relation"] {
+  background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+}
+
+.causeButton[data-cause="maison"] {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+}
+
+.causeButton[data-cause="finances"] {
+  background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%);
+}
+
+.causeButton[data-cause="mental"] {
+  background: linear-gradient(135deg, #6A82FB 0%, #FC5C7D 100%);
+}
+
+.causeButton[data-cause="autre"] {
+  background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+}
+
+.causeEmoji {
+  font-size: 18px;
+  margin-right: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.causeLabel {
+  position: relative;
+  z-index: 2;
+}
+
 .startButtonContainer {
   display: flex;
   justify-content: center;
@@ -398,9 +432,6 @@
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
-/* Suppression des styles pour le bouton microphone et les animations d'écoute */
-
-/* Emotion selector styles */
 .emotionSelector {
   display: flex;
   flex-wrap: wrap;
@@ -431,7 +462,6 @@
   font-size: 0.8rem;
 }
 
-/* Reason selector styles */
 .reasonSelector {
   display: flex;
   flex-wrap: wrap;
@@ -439,7 +469,6 @@
   justify-content: center;
 }
 
-/* Emoji sélection pour la cause */
 .emojiCauseContainer {
   display: flex;
   flex-direction: column;
@@ -561,7 +590,6 @@
   align-items: center;
 }
 
-/* Mood tags styles */
 .moodTagsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -602,8 +630,6 @@
 .moodTagIcon {
   font-size: 1.2rem;
 }
-
-/* Supprimer optionsContainer qui n'est plus utilisé */
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

@@ -1,22 +1,53 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import styles from './page.module.css';
-import FeedPostCard from '@/components/Feed/FeedPostCard';
-import { Post } from '@/types/feed';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import styles from './page.module.css';
+import { Post } from '@/types/feed';
+import FeedPostCard from '@/components/Feed/FeedPostCard';
+import { getLatestUserJourneyEntry } from '@/utils/userJourney';
+import Image from 'next/image';
+import Navbar from '@/components/Navigation/Navbar';
 
 export default function FeedPage() {
+  const searchParams = useSearchParams();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState('aujourd\'hui');
   
-  // Récupérer l'émotion et la cause des paramètres d'URL
+  // Récupérer l'émotion et la cause des paramètres d'URL ou du parcours utilisateur
   const emotion = searchParams.get('emotion') || undefined;
   const cause = searchParams.get('cause') || undefined;
+  
+  // États pour stocker les informations d'émotion et de cause réellement utilisées
+  const [activeEmotion, setActiveEmotion] = useState<string | undefined>(emotion);
+  const [activeCause, setActiveCause] = useState<string | undefined>(cause);
+  
+  // Ajouter des logs pour le débogage
+  useEffect(() => {
+    console.log('Paramètres URL:', { emotion, cause });
+    
+    // Si les paramètres ne sont pas dans l'URL, essayer de les récupérer du parcours utilisateur
+    if (!emotion || !cause) {
+      const latestEntry = getLatestUserJourneyEntry();
+      if (latestEntry) {
+        console.log('Informations récupérées du parcours utilisateur:', latestEntry);
+        
+        if (!emotion && latestEntry.emotion) {
+          setActiveEmotion(latestEntry.emotion.toString());
+        }
+        
+        if (!cause && latestEntry.reason) {
+          setActiveCause(latestEntry.reason);
+        }
+      }
+    }
+    
+    console.log('Informations actives pour la génération de posts:', { 
+      activeEmotion: activeEmotion || emotion, 
+      activeCause: activeCause || cause 
+    });
+  }, [emotion, cause, activeEmotion, activeCause]);
   
   // Récupérer les posts depuis l'API
   const fetchPosts = useCallback(async () => {
@@ -27,38 +58,37 @@ export default function FeedPage() {
       // Construire l'URL avec les paramètres de filtrage
       let url = '/api/feed/posts?';
       
-      // Ajouter l'émotion et la cause si présentes
-      if (emotion) url += `emotion=${encodeURIComponent(emotion)}&`;
-      if (cause) url += `cause=${encodeURIComponent(cause)}&`;
+      // Ajouter l'émotion et la cause si présentes, en utilisant 'mood' au lieu de 'emotion'
+      const emotionToUse = activeEmotion || emotion;
+      const causeToUse = activeCause || cause;
+      
+      if (emotionToUse) url += `mood=${encodeURIComponent(emotionToUse)}&`;
+      if (causeToUse) url += `reason=${encodeURIComponent(causeToUse)}&`;
+      
+      console.log('URL de requête API:', url);
       
       // Récupérer les posts
       const response = await fetch(url);
+      const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des posts: ${response.status}`);
+      if (data.error) {
+        console.error('Erreur API:', data.error);
+        setError(data.error);
       }
       
-      const data = await response.json();
       setPosts(data.posts || []);
-    } catch (err) {
-      console.error('Erreur lors de la récupération des posts:', err);
-      setError("Impossible de charger les posts. Veuillez réessayer plus tard.");
-      // Utiliser des posts par défaut en cas d'erreur
-      setPosts([]);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des posts:', error);
+      setError('Impossible de récupérer les posts. Veuillez réessayer plus tard.');
     } finally {
       setIsLoading(false);
     }
-  }, [emotion, cause]);
-  
+  }, [activeEmotion, activeCause, emotion, cause]);
+
   // Charger les posts au chargement initial ou quand les paramètres changent
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts, emotion, cause]);
-
-  // Fonction pour changer d'onglet activé
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
+  }, [fetchPosts, activeEmotion, activeCause, emotion, cause]);
 
   // Rendu du composant
   return (
@@ -107,65 +137,8 @@ export default function FeedPage() {
         )}
       </div>
       
-      {/* Barre de navigation en bas */}
-      <div className={styles.bottomNavbar}>
-        <div className={styles.navButton}>
-          <div 
-            onClick={() => handleTabChange('aujourd\'hui')}
-            className={`${styles.navLink} ${activeTab === 'aujourd\'hui' ? styles.active : ''}`}
-          >
-            <div className={styles.navIcon}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span>Aujourd&apos;hui</span>
-          </div>
-        </div>
-        <div className={styles.navButton}>
-          <div 
-            onClick={() => handleTabChange('explorer')}
-            className={`${styles.navLink} ${activeTab === 'explorer' ? styles.active : ''}`}
-          >
-            <div className={styles.navIcon}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span>Explorer</span>
-          </div>
-        </div>
-        <div className={styles.navButton}>
-          <div 
-            onClick={() => handleTabChange('map')}
-            className={`${styles.navLink} ${activeTab === 'map' ? styles.active : ''}`}
-          >
-            <div className={styles.navIcon}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span>Carte</span>
-          </div>
-        </div>
-        <div className={styles.navButton}>
-          <div 
-            onClick={() => handleTabChange('profil')}
-            className={`${styles.navLink} ${activeTab === 'profil' ? styles.active : ''}`}
-          >
-            <div className={styles.navIcon}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span>Profil</span>
-          </div>
-        </div>
-      </div>
+      {/* Utilisation du composant Navbar partagé */}
+      <Navbar />
     </main>
   );
 }

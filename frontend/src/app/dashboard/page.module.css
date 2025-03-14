@@ -1,0 +1,336 @@
+/* Style général de la page */
+.pageWrapper {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f6fa;
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  padding-bottom: 72px; /* Espace pour la navbar */
+}
+
+/* Container du dashboard avec grille pour desktop */
+.dashboardContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 1.5rem;
+}
+
+/* En-tête du dashboard */
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  background-color: #1f2a6a;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.userInfoSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0.5rem 0 0;
+  opacity: 0.9;
+}
+
+/* Sélecteur de date */
+.dateSelector {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+
+.dateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dateCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.selectedDate {
+  background-color: #1f2a6a;
+  color: white;
+}
+
+.day {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.month {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* Section d'aperçu de l'activité */
+.activityOverviewSection {
+  grid-column: 1 / -1;
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.chartContainer {
+  height: 220px;
+  width: 100%;
+}
+
+/* Section des cartes d'activité */
+.activityCardsSection {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 1.5rem;
+}
+
+.activityCard {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.activityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.activityTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.activityIcon {
+  font-size: 1.5rem;
+}
+
+/* Style pour les indicateurs de marche */
+.circleProgressContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circleProgress {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: conic-gradient(#F5603D 0% 70%, #f1f1f1 70% 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.circleProgress::after {
+  content: '';
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.progressValue {
+  position: relative;
+  z-index: 1;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Style pour le graphique de sommeil */
+.sleepChartContainer {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 1rem;
+  gap: 0.5rem;
+}
+
+.sleepBar {
+  flex: 1;
+  background-color: #1f2a6a;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s ease;
+}
+
+.sleepValues {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Style pour la carte */
+.mapContainer {
+  flex: 1;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.mapLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #f5f6fa;
+  color: #666;
+}
+
+/* Section des statistiques */
+.statsSummarySection {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 1rem;
+}
+
+.statsSectionTitle {
+  grid-column: 1 / -1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0.5rem 0 1rem;
+}
+
+.statCard {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statIcon {
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 50px;
+  background-color: #f5f6fa;
+  border-radius: 50%;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Responsive design pour tablettes */
+@media screen and (max-width: 1024px) {
+  .dashboardContainer {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 1.5rem;
+  }
+  
+  .activityCardsSection {
+    grid-template-columns: 1fr;
+  }
+  
+  .statsSummarySection {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive design pour mobiles */
+@media screen and (max-width: 768px) {
+  .dashboardContainer {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .activityCardsSection {
+    grid-template-columns: 1fr;
+  }
+  
+  .statsSummarySection {
+    grid-template-columns: 1fr;
+  }
+  
+  .activityCard {
+    height: auto;
+    min-height: 180px;
+  }
+  
+  .chartContainer {
+    height: 180px;
+  }
+}
